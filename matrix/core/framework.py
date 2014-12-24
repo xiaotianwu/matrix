@@ -1,17 +1,20 @@
 __author__ = 'xiaotian.wu'
 
+import os
+import time
+
 import mesos.native
 import mesos.interface
 from mesos.interface import mesos_pb2
 from scheduler import MatrixScheduler
 from task import *
-import time
 
 class MatrixFramework:
   def __init__(self):
     self._framework = mesos_pb2.FrameworkInfo()
     self._framework.user = ""
-    self._framework.id.value = "Matrix"
+    self._framework.id.value = ""
+    self._framework.failover_timeout = 0
     self._framework.name = "Matrix"
 
   def install(self):
@@ -23,7 +26,7 @@ class MatrixFramework:
     print "framework install ok"
 
   def start(self):
-    self._driver.run()
+    self._driver.start()
 
   def stop(self):
     self._driver.stop()
@@ -38,12 +41,16 @@ if __name__ == '__main__':
   framework = MatrixFramework()
   framework.install()
   framework.start()
-  time.sleep(100)
+  time.sleep(2)
+  print "add task"
   task = Task()
   task.id = 1
   task.name = "test"
   constraint = TaskConstraint()
   constraint.cpus = 1
   constraint.mem = 2048
+  constraint.host = "MIS-BJ-6-5A9"
   task.constraint = constraint
   framework.add_task(task)
+  time.sleep(20)
+  framework.stop()

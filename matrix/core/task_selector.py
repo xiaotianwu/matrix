@@ -9,12 +9,12 @@ class TaskSelector:
 
   def match(self):
     scheduled_task = []
-    for task in tasks:
-      for offer in offers:
+    for task in self.tasks:
+      for offer in self.offers:
         logger.debug("offer detail: %s" % offer)
         if task.constraint.host == offer.hostname:
           task.offer = offer
-          offers.remove(offer)
-          scheduled_task.add(task)
+          self.offers.remove(offer)
+          scheduled_task.append(task)
           break
     return scheduled_task

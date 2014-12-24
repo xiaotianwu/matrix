@@ -71,9 +71,12 @@ class TaskManager:
       if self._task_set[task_id].state != TaskState.Pending:
         raise Exception("task id: %s is not pending state" % task_id)
       self._task_set[task_id].offer = None
-      pending_tasks.add(self._task_set[task_id])
+      pending_tasks.append(self._task_set[task_id])
+    print 'offers: ', offers
+    print 'pending tasks: ', pending_tasks
     selector = TaskSelector(offers, pending_tasks)
     scheduled_tasks = selector.match()
+    print 'scheduled tasks: ', scheduled_tasks
     return scheduled_tasks
 
   def get_task(self, task_id):
