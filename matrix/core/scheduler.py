@@ -35,18 +35,23 @@ class MatrixScheduler(mesos.interface.Scheduler):
       task_info.name = task.name
 
       docker_info = mesos_pb2.ContainerInfo.DockerInfo()
-      docker_info.image = "xxxx/xxxx"
+      docker_info.image = "cpdc/kafka_mesos"
+      docker_info.privileged = True
+      par1 = docker_info.parameters.add()
+      par1.key = 'env'
+      par1.value = 'LIBPROCESS_IP=223.202.46.150'
       docker_info.network = mesos_pb2.ContainerInfo.DockerInfo.HOST
       container_info = mesos_pb2.ContainerInfo()
       container_info.docker.CopyFrom(docker_info)
       container_info.type = mesos_pb2.ContainerInfo.DOCKER
       executor_info = mesos_pb2.ExecutorInfo()
+      executor_info.executor_id.value = "MatrixExecutor4"
+      executor_info.command.value = ""
+      executor_info.command.shell = False
+      executor_info.name = "MatrixExecutor"
       executor_info.container.CopyFrom(container_info)
      
       task_info.executor.CopyFrom(executor_info)
-      task_info.executor.executor_id.value = "matrix-executor"
-      task_info.executor.command.value = "yyyy"
-      task_info.executor.name = "MatrixExecutor"
 
       cpus = task_info.resources.add()
       cpus.name = "cpus"

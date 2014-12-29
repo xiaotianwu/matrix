@@ -49,8 +49,8 @@ if __name__ == '__main__':
   constraint = TaskConstraint()
   constraint.cpus = 1
   constraint.mem = 2048
-  constraint.host = "MIS-BJ-6-5A9"
+  constraint.host = "MIS-BJ-6-5C1"
   task.constraint = constraint
   framework.add_task(task)
-  time.sleep(20)
+  time.sleep(60000)
   framework.stop()
