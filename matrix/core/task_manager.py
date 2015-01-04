@@ -1,8 +1,8 @@
 __author__ = 'xiaotian.wu'
 
 from collections import deque
-from task import *
-from task_selector import TaskSelector
+from matrix.core.task import *
+from matrix.core.task_selector import TaskSelector
 
 class TaskManager:
   def __init__(self):

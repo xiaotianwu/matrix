@@ -1,4 +1,4 @@
-__author__ = 'xiaotian.wu'
+__author__ = 'xiaotian.wu@chinacache.com'
 
 import os
 import time
@@ -6,8 +6,10 @@ import time
 import mesos.native
 import mesos.interface
 from mesos.interface import mesos_pb2
-from scheduler import MatrixScheduler
-from task import *
+from matrix.core.scheduler import MatrixScheduler
+from matrix.core.task import *
+from matrix.core.config import config
+from matrix.core.logger import logger
 
 class MatrixFramework:
   def __init__(self):
@@ -19,16 +21,21 @@ class MatrixFramework:
 
   def install(self):
     self._scheduler = MatrixScheduler()
+    host = config.get("mesos", "host")
+    if len(host) == 0:
+      raise Exception("host is empty")
+    logger.info("install framework on mesos host: %s" % host)
     self._driver = mesos.native.MesosSchedulerDriver(
       self._scheduler,
       self._framework,
-      "223.202.46.132:5050")
-    print "framework install ok"
+      host)
+    logger.info("framework install ok")
 
   def start(self):
     self._driver.start()
 
   def stop(self):
+    logger.info("stop framework")
     self._driver.stop()
 
   def add_task(self, task):
@@ -41,16 +48,16 @@ if __name__ == '__main__':
   framework = MatrixFramework()
   framework.install()
   framework.start()
-  time.sleep(2)
-  print "add task"
-  task = Task()
-  task.id = 1
-  task.name = "test"
-  constraint = TaskConstraint()
-  constraint.cpus = 1
-  constraint.mem = 2048
-  constraint.host = "MIS-BJ-6-5C1"
-  task.constraint = constraint
-  framework.add_task(task)
-  time.sleep(60000)
+  time.sleep(20)
+  #print "add task"
+  #task = Task()
+  #task.id = 1
+  #task.name = "test"
+  #constraint = TaskConstraint()
+  #constraint.cpus = 1
+  #constraint.mem = 2048
+  #constraint.host = "MIS-BJ-6-5A2"
+  #task.constraint = constraint
+  #framework.add_task(task)
+  #time.sleep(60000)
   framework.stop()

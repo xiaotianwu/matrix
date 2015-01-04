@@ -1,11 +1,9 @@
-__author__ = 'xiaotian.wu'
+__author__ = 'xiaotian.wu@chinacache.com'
 
-from util import Enum
+from matrix.core.util import Enum
 
 TaskPriority = Enum(['Low', 'Median', 'High', 'RealTime'])
-
-TaskProperty = Enum(['Transfered', 'Exclusive', 'AutoRestart'])
-
+TaskProperty = Enum(['Stateless', 'Exclusive', 'AutoRestart'])
 TaskState = Enum(['Pending', 'Scheduled', 'Running', 'Error', 'Finish'])
 
 class TaskConstraint:
@@ -17,6 +15,7 @@ class TaskConstraint:
 class Task:
   id = None
   name = None
+  docker_image = None
   constraint = None
   priority = None
   property = None

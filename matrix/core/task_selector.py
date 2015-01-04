@@ -1,6 +1,6 @@
 __author__ = 'xiaotian.wu'
 
-from logger import logger
+from matrix.core.logger import logger
 
 class TaskSelector:
   def __init__(self, offers, tasks):
