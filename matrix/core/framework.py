@@ -38,11 +38,17 @@ class MatrixFramework:
     logger.info("stop framework")
     self._driver.stop()
 
-  def add_task(self, task):
-    self._scheduler.add_task(task)
+  def new(self, task):
+    self._scheduler.new(task)
 
-  def remove_task(self, task):
-    self._scheduler.remove_task(task)
+  def get(self, task_id):
+    pass
+
+  def list(self, condition):
+    pass
+
+  def delete(self, task_id):
+    self._scheduler.delete(task_id)
 
 if __name__ == '__main__':
   framework = MatrixFramework()

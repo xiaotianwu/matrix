@@ -13,10 +13,10 @@ class MatrixScheduler(mesos.interface.Scheduler):
   def __init__(self):
     self._task_manager = TaskManager()
 
-  def add_task(self, task):
+  def new(self, task):
     self._task_manager.add(task)
 
-  def remove_task(self, task_id):
+  def delete(self, task_id):
     self._task_manager.remove(task_id)
 
   def registered(self, driver, frameworkId, masterInfo):
