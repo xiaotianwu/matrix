@@ -19,8 +19,12 @@ class TaskDistributor:
       cpus = get_cpus_in_offer(offer)
       mem = get_mem_in_offer(offer)
       weight = self.calculate_weight(cpus, mem)
-      self.offers_mapping[weight] = (offer.id, cpus, mem, offer.hostname)
-      self.offers_reverse_mapping[offer.hostname] = (offer, weight)
+      self.offers_mapping[weight] = (offer.id,
+                                     offer.slave_id.value,
+                                     cpus,
+                                     mem,
+                                     offer.hostname)
+      self.offers_reverse_mapping[offer.hostname] = weight
 
   def calculate_weight(self, cpus, mem): 
     weight = 0 - cpus * CPU_FACTOR + mem * MEM_FACTOR / 1024
@@ -35,25 +39,28 @@ class TaskDistributor:
     scheduled_task = []
 
     for task in self.tasks:
-      (offer.id, cpus, mem, offer.hostname) = self.offers_mapping.pop()
       choose = False
+      offer_id, slave_id, cpus, mem, hostname = None, None, None, None, None
       if not task.constraint.host.strip():
+        offer_id, slave_id, cpus, mem, hostname = self.offers_mapping.pop()
         if cpus > task.constraint.cpus and mem > task.constraint.mem:
           choose = True
       else:
-        if task.constraint.host == offer.hostname:
-          if cpus > task.constraint.cpus and mem > task.constraint.mem:
-            choose = True
+        iterator = self.offers_mapping.goto(self.offers_reverse_mapping[task.constraint.host])
+        offer_id, slave_id, cpus, mem, hostname = iterator.get()
+        iterator.delete()
+        if cpus > task.constraint.cpus and mem > task.constraint.mem:
+          choose = True
 
       if choose is True:
-        offer = self.offers_reverse_mapping[offer.hostname]
-        task.offer = offer
+        task.offer_id = offer_id
+        task.slave_id = slave_id
         scheduled_task.append(task)
         cpus -= task.constraint.cpus
         mem -= task.constraint.mem
         weight = self.calculate_weight(cpus, mem)
-        self.offers_mapping[weight] = (offer.id, cpus, mem, offer.hostname)
-        self.offers_reverse_mapping[offer.hostname] = (offer, weight)
+        self.offers_mapping[weight] = (offer_id, slave_id, cpus, mem, hostname)
+        self.offers_reverse_mapping[hostname] = weight
         break
 
     return scheduled_task

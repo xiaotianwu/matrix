@@ -22,7 +22,7 @@ class Task:
   state = None
   strategy = None
   command = None
-  offer = None
+  offer_id = None
   slave_id = None
   executor_id = None
 
