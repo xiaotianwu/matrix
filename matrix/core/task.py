@@ -16,7 +16,7 @@ class Task:
   id = None
   name = None
   docker_image = None
-  constraint = None
+  constraint = TaskConstraint()
   priority = None
   property = None
   state = None
