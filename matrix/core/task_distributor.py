@@ -36,9 +36,8 @@ class TaskDistributor:
       logger.info(str(key) + '\t' + str(self.offers_reverse_mapping[key]))
 
   def calculate_weight(self, cpus, mem): 
-    weight = 0 - cpus * CPU_FACTOR + mem * MEM_FACTOR / 1024
-    # avoid same value appeared in rb tree
-    # such that, the ealier offer will have smaller weight
+    weight = -(cpus * CPU_FACTOR + mem * MEM_FACTOR)
+    # avoid same value appeared in rb tree, the ealier offer will have smaller weight
     while self.offers_mapping.has_key(weight):
       weight += 0.0001
     return weight
@@ -50,35 +49,38 @@ class TaskDistributor:
     for task in self.tasks:
       choose = False
       offer_id, slave_id, cpus, mem, hostname = None, None, None, None, None
-      if task.constraint.host is not None and not task.constraint.host.strip():
-        iterator = iter(self.offers_mapping).goto(self.offers_reverse_mapping[task.constraint.host])
+      if task.constraint.host is not None:# and not task.constraint.host.strip():
+        iterator = iter(self.offers_mapping)
+        iterator.goto(self.offers_reverse_mapping[task.constraint.host])
         offer_id, slave_id, cpus, mem, hostname = iterator.get()
         try:
           iterator.delete()
         except StopIteration:
           pass
-        if cpus > task.constraint.cpus and mem > task.constraint.mem:
+        if cpus >= task.constraint.cpus and mem >= task.constraint.mem:
           choose = True
       else:
         offer_id, slave_id, cpus, mem, hostname = self.offers_mapping.pop()
-        if cpus > task.constraint.cpus and mem > task.constraint.mem:
+        if cpus >= task.constraint.cpus and mem >= task.constraint.mem:
           choose = True
 
       if choose is True:
         task.offer_id = offer_id
         task.slave_id = slave_id
-        logger.info("assign task id: %s to offer id: %s, slave id: %s"
-                    %(task.id, task.offer_id, task.slave_id))
         scheduled_task.append(task)
         cpus -= task.constraint.cpus
         mem -= task.constraint.mem
+        logger.info("assign task id: %s to offer id: %s, slave id: %s"
+                    %(task.id, task.offer_id, task.slave_id))
         weight = self.calculate_weight(cpus, mem)
         self.offers_mapping[weight] = (offer_id, slave_id, cpus, mem, hostname)
         self.offers_reverse_mapping[hostname] = weight
+        self.debug_info()
 
     return scheduled_task
 
 if __name__ == '__main__':
+  import copy
   import unittest
   import mesos.interface
   from mesos.interface import mesos_pb2
@@ -132,9 +134,42 @@ if __name__ == '__main__':
       task1.id = '1'
       task1.constraint.cpus = 2
       task1.constraint.mem = 3
-      tasks = []
-      tasks.append(task1)
-      task_distributor = TaskDistributor(self.offers, tasks)
+      task2 = Task()
+      task2.id = '2'
+      task2.constraint.cpus = 3
+      task2.constraint.mem = 2
+      task3 = Task()
+      task3.id = '3'
+      task3.constraint.cpus = 1
+      task3.constraint.mem = 1
+      tasks = [task1, task2, task3]
+      offers = copy.deepcopy(self.offers)
+      task_distributor = TaskDistributor(offers, tasks)
       task_distributor.assign()
+      self.assertEqual(task1.offer_id.value, '3')
+      self.assertEqual(task2.offer_id.value, '2')
+      self.assertEqual(task3.offer_id.value, '1')
+
+    def testDistribution2(self):
+      task1 = Task()
+      task1.id = '1'
+      task1.constraint.cpus = 2
+      task1.constraint.mem = 3
+      task1.constraint.host = 'A'
+      task2 = Task()
+      task2.id = '2'
+      task2.constraint.cpus = 3
+      task2.constraint.mem = 2
+      task3 = Task()
+      task3.id = '3'
+      task3.constraint.cpus = 1
+      task3.constraint.mem = 1
+      tasks = [task1, task2, task3]
+      offers = copy.deepcopy(self.offers)
+      task_distributor = TaskDistributor(offers, tasks)
+      task_distributor.assign()
+      self.assertEqual(task1.offer_id.value, '1')
+      self.assertEqual(task2.offer_id.value, '3')
+      self.assertEqual(task3.offer_id.value, '2')
 
   unittest.main()

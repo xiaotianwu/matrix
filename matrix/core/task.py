@@ -7,24 +7,26 @@ TaskProperty = Enum(['Stateless', 'Exclusive', 'AutoRestart'])
 TaskState = Enum(['Pending', 'Scheduled', 'Running', 'Error', 'Finish'])
 
 class TaskConstraint:
-  cpus = None
-  mem = None
-  rack = None
-  host = None
+  def __init__(self):
+    self.cpus = None
+    self.mem = None
+    self.rack = None
+    self.host = None
 
 class Task:
-  id = None
-  name = None
-  docker_image = None
-  constraint = TaskConstraint()
-  priority = None
-  property = None
-  state = None
-  strategy = None
-  command = None
-  offer_id = None
-  slave_id = None
-  executor_id = None
+  def __init__(self):
+    self.id = None
+    self.name = None
+    self.docker_image = None
+    self.constraint = TaskConstraint()
+    self.priority = None
+    self.property = None
+    self.state = None
+    self.strategy = None
+    self.command = None
+    self.offer_id = None
+    self.slave_id = None
+    self.executor_id = None
 
 if __name__ == '__main__':
   task = Task()

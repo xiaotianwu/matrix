@@ -1,8 +1,10 @@
 __author__ = 'xiaotian.wu'
 
 from collections import deque
+
+from matrix.core.logger import logger
 from matrix.core.task import *
-from matrix.core.task_selector import TaskSelector
+from matrix.core.task_distributor import TaskDistributor
 
 class TaskManager:
   def __init__(self):
@@ -12,6 +14,10 @@ class TaskManager:
     self._error_list = set()
     self._finish_list = set()
     self._task_set = {}
+
+  def add_list(self, tasks):
+    for task in tasks:
+      self.add(task)
 
   def add(self, task):
     if task.id is None:
@@ -72,11 +78,11 @@ class TaskManager:
         raise Exception("task id: %s is not pending state" % task_id)
       self._task_set[task_id].offer = None
       pending_tasks.append(self._task_set[task_id])
-    print 'offers: ', offers
-    print 'pending tasks: ', pending_tasks
-    selector = TaskSelector(offers, pending_tasks)
-    scheduled_tasks = selector.match()
-    print 'scheduled tasks: ', scheduled_tasks
+    logger.info('offers: %s' % offers)
+    logger.info('pending tasks: %s' % pending_tasks)
+    distributor = TaskDistributor(offers, pending_tasks)
+    scheduled_tasks = distributor.assign()
+    logger.info('scheduled tasks: %s' % scheduled_tasks)
     return scheduled_tasks
 
   def get_task(self, task_id):
@@ -86,18 +92,82 @@ class TaskManager:
       raise Exception("task id: %s does not exist" % task_id)
 
 if __name__ == '__main__':
-  task_manager = TaskManager()
-  task = Task()
-  task.id = 1
-  task.constraint = TaskConstraint()
-  task.constraint.cpus = 1
-  task.constraint.mem = 1024
-  task_manager.add(task)
-  print task.state
-  task_manager.move_to_next_state(1)
-  print task.state
-  task_manager.move_to_next_state(1)
-  print task.state
-  task_manager.move_to_next_state(1)
-  print task.state
-  task_manager.remove(1)
+  import unittest
+  import mesos.interface
+  from mesos.interface import mesos_pb2
+
+  class TaskManagerTest(unittest.TestCase):
+    def testStateTransfer(self):
+      task = Task()
+      task.id = 1
+      task.constraint = TaskConstraint()
+      task.constraint.cpus = 1
+      task.constraint.mem = 1024
+      task_manager = TaskManager()
+      task_manager.add(task)
+      self.assertEqual(task.state, TaskState.Pending)
+      task_manager.move_to_next_state(1)
+      self.assertEqual(task.state, TaskState.Scheduled)
+      task_manager.move_to_next_state(1)
+      self.assertEqual(task.state, TaskState.Running)
+      task_manager.move_to_next_state(1)
+      self.assertEqual(task.state, TaskState.Finish)
+      task_manager.remove(1)
+
+    def testSchedule(self):
+      task1 = Task()
+      task1.id = '1'
+      task1.constraint.cpus = 2
+      task1.constraint.mem = 3
+      task1.constraint.host = 'A'
+      task2 = Task()
+      task2.id = '2'
+      task2.constraint.cpus = 3
+      task2.constraint.mem = 2
+      task3 = Task()
+      task3.id = '3'
+      task3.constraint.cpus = 1
+      task3.constraint.mem = 1
+      tasks = [task1, task2, task3]
+      offer1 = mesos_pb2.Offer()
+      offer1.id.value = '1'
+      offer1.slave_id.value = '1'
+      offer1.hostname = 'A'
+      cpus_res = offer1.resources.add()
+      cpus_res.name = 'cpus'
+      cpus_res.type = mesos_pb2.Value.SCALAR
+      cpus_res.scalar.value = 3
+      mem_res = offer1.resources.add()
+      mem_res.name = 'mem'
+      mem_res.type = mesos_pb2.Value.SCALAR
+      mem_res.scalar.value = 3
+      offer2 = mesos_pb2.Offer()
+      offer2.id.value = '2'
+      offer2.slave_id.value = '2'
+      offer2.hostname = 'B'
+      cpus_res = offer2.resources.add()
+      cpus_res.name = 'cpus'
+      cpus_res.type = mesos_pb2.Value.SCALAR
+      cpus_res.scalar.value = 4
+      mem_res = offer2.resources.add()
+      mem_res.name = 'mem'
+      mem_res.type = mesos_pb2.Value.SCALAR
+      mem_res.scalar.value = 4
+      offer3 = mesos_pb2.Offer()
+      offer3.id.value = '3'
+      offer3.slave_id.value = '3'
+      offer3.hostname = 'C'
+      cpus_res = offer3.resources.add()
+      cpus_res.name = 'cpus'
+      cpus_res.type = mesos_pb2.Value.SCALAR
+      cpus_res.scalar.value = 5
+      mem_res = offer3.resources.add()
+      mem_res.name = 'mem'
+      mem_res.type = mesos_pb2.Value.SCALAR
+      mem_res.scalar.value = 5
+      offers = [offer1, offer2, offer3]
+      task_manager = TaskManager()
+      task_manager.add_list(tasks)
+      task_manager.schedule(offers)
+
+  unittest.main()
