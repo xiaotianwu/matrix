@@ -13,33 +13,33 @@ from matrix.core.logger import logger
 
 class MatrixFramework:
   def __init__(self):
-    self._framework = mesos_pb2.FrameworkInfo()
-    self._framework.user = ""
-    self._framework.id.value = ""
-    self._framework.failover_timeout = 0
-    self._framework.name = "Matrix"
+    self.framework = mesos_pb2.FrameworkInfo()
+    self.framework.user = ""
+    self.framework.id.value = ""
+    self.framework.failover_timeout = 0
+    self.framework.name = "Matrix"
 
   def install(self):
-    self._scheduler = MatrixScheduler()
+    self.scheduler = MatrixScheduler()
     host = config.get("mesos", "host")
     if len(host) == 0:
       raise Exception("host is empty")
     logger.info("install framework on mesos host: %s" % host)
-    self._driver = mesos.native.MesosSchedulerDriver(
-      self._scheduler,
-      self._framework,
+    self.driver = mesos.native.MesosSchedulerDriver(
+      self.scheduler,
+      self.framework,
       host)
     logger.info("framework install ok")
 
   def start(self):
-    self._driver.start()
+    self.driver.start()
 
   def stop(self):
     logger.info("stop framework")
-    self._driver.stop()
+    self.driver.stop()
 
   def new(self, task):
-    self._scheduler.new(task)
+    self.scheduler.new(task)
 
   def get(self, task_id):
     pass
@@ -48,7 +48,7 @@ class MatrixFramework:
     pass
 
   def delete(self, task_id):
-    self._scheduler.delete(task_id)
+    self.scheduler.delete(task_id)
 
 if __name__ == '__main__':
   framework = MatrixFramework()

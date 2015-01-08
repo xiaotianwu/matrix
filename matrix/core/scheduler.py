@@ -1,4 +1,4 @@
-__author__ = 'xiaotian.wu'
+__author__ = 'xiaotian.wu@chinacache.com'
 
 import mesos.interface
 from mesos.interface import mesos_pb2
@@ -11,13 +11,13 @@ class MatrixScheduler(mesos.interface.Scheduler):
   total_task = 10000
 
   def __init__(self):
-    self._task_manager = TaskManager()
+    self.task_manager = TaskManager()
 
   def new(self, task):
-    self._task_manager.add(task)
+    self.task_manager.add(task)
 
   def delete(self, task_id):
-    self._task_manager.remove(task_id)
+    self.task_manager.remove(task_id)
 
   def registered(self, driver, frameworkId, masterInfo):
     logger.info("registered framework id %s" % frameworkId.value)
@@ -25,7 +25,7 @@ class MatrixScheduler(mesos.interface.Scheduler):
 
   def resourceOffers(self, driver, offers):
     logger.info('rescource offers from %s' % [offer.hostname for offer in offers])
-    scheduled_tasks = self._task_manager.schedule(offers)
+    scheduled_tasks = self.task_manager.schedule(offers)
 
     accept_offer_ids = []
     for task in scheduled_tasks:
@@ -38,9 +38,6 @@ class MatrixScheduler(mesos.interface.Scheduler):
       docker_info = mesos_pb2.ContainerInfo.DockerInfo()
       docker_info.image = task.docker_image
       docker_info.privileged = True
-      par1 = docker_info.parameters.add()
-      par1.key = 'env'
-      par1.value = 'LIBPROCESS_IP=223.202.46.133'
       docker_info.network = mesos_pb2.ContainerInfo.DockerInfo.HOST
       container_info = mesos_pb2.ContainerInfo()
       container_info.docker.CopyFrom(docker_info)
@@ -73,7 +70,7 @@ class MatrixScheduler(mesos.interface.Scheduler):
       tasks_info = []
       tasks_info.append(task_info)
       driver.launchTasks(task.offer.id, tasks_info)
-      self._task_manager.move_to_next_state(task.id)
+      self.task_manager.move_to_next_state(task.id)
       accept_offer_ids.append(task.offer.id)
 
     for offer in offers:
@@ -82,20 +79,20 @@ class MatrixScheduler(mesos.interface.Scheduler):
 
   def statusUpdate(self, driver, update):
     logger.info('update task id: %s' % update.task_id.value)
-    task = self._task_manager.get_task(int(update.task_id.value))
+    task = self.task_manager.get_task(int(update.task_id.value))
     slave_id, executor_id = task.slave_id, task.executor_id
     logger.info('slave id: %s, executor id: %s' % (task.slave_id, task.executor_id))
 
     if update.state == mesos_pb2.TASK_RUNNING:
       logger.info("task %s is running" % update.task_id.value)
-      self._task_manager.move_to_next_state(task.id)
+      self.task_manager.move_to_next_state(task.id)
 
     if update.state == mesos_pb2.TASK_FINISHED:
       logger.info("task %s finished, message: %s" % (update.task_id.value, update.message))
-      self._task_manager.move_to_next_state(task.id)
+      self.task_manager.move_to_next_state(task.id)
 
     if update.state == mesos_pb2.TASK_FAILED:
-      self._task_manager.move_to_next_state(task.id, "error")
+      self.task_manager.move_to_next_state(task.id, "error")
       logger.error("task %s failed, error str: %s" % (update.task_id.value, update.message))
 
     if update.state == mesos_pb2.TASK_KILLED or\
