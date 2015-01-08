@@ -36,7 +36,7 @@ class TaskDistributor:
       logger.info(str(key) + '\t' + str(self.offers_reverse_mapping[key]))
 
   def calculate_weight(self, cpus, mem): 
-    weight = -(cpus * CPU_FACTOR + mem * MEM_FACTOR)
+    weight = -(cpus * CPU_FACTOR + mem / 1024 * MEM_FACTOR)
     # avoid same value appeared in rb tree, the ealier offer will have smaller weight
     while self.offers_mapping.has_key(weight):
       weight += 0.0001
@@ -98,7 +98,7 @@ if __name__ == '__main__':
       mem_res = offer1.resources.add()
       mem_res.name = 'mem'
       mem_res.type = mesos_pb2.Value.SCALAR
-      mem_res.scalar.value = 3
+      mem_res.scalar.value = 3072
       offer2 = mesos_pb2.Offer()
       offer2.id.value = '2'
       offer2.slave_id.value = '2'
@@ -110,7 +110,7 @@ if __name__ == '__main__':
       mem_res = offer2.resources.add()
       mem_res.name = 'mem'
       mem_res.type = mesos_pb2.Value.SCALAR
-      mem_res.scalar.value = 4
+      mem_res.scalar.value = 4096
       offer3 = mesos_pb2.Offer()
       offer3.id.value = '3'
       offer3.slave_id.value = '3'
@@ -122,7 +122,7 @@ if __name__ == '__main__':
       mem_res = offer3.resources.add()
       mem_res.name = 'mem'
       mem_res.type = mesos_pb2.Value.SCALAR
-      mem_res.scalar.value = 5
+      mem_res.scalar.value = 5120
       self.offers = [offer1, offer2, offer3]
 
     def testInialize(self):
@@ -133,15 +133,15 @@ if __name__ == '__main__':
       task1 = Task()
       task1.id = '1'
       task1.constraint.cpus = 2
-      task1.constraint.mem = 3
+      task1.constraint.mem = 3072
       task2 = Task()
       task2.id = '2'
       task2.constraint.cpus = 3
-      task2.constraint.mem = 2
+      task2.constraint.mem = 2048
       task3 = Task()
       task3.id = '3'
       task3.constraint.cpus = 1
-      task3.constraint.mem = 1
+      task3.constraint.mem = 1024
       tasks = [task1, task2, task3]
       offers = copy.deepcopy(self.offers)
       task_distributor = TaskDistributor(offers, tasks)
@@ -154,16 +154,16 @@ if __name__ == '__main__':
       task1 = Task()
       task1.id = '1'
       task1.constraint.cpus = 2
-      task1.constraint.mem = 3
+      task1.constraint.mem = 3072
       task1.constraint.host = 'A'
       task2 = Task()
       task2.id = '2'
       task2.constraint.cpus = 3
-      task2.constraint.mem = 2
+      task2.constraint.mem = 2048
       task3 = Task()
       task3.id = '3'
       task3.constraint.cpus = 1
-      task3.constraint.mem = 1
+      task3.constraint.mem = 1024
       tasks = [task1, task2, task3]
       offers = copy.deepcopy(self.offers)
       task_distributor = TaskDistributor(offers, tasks)

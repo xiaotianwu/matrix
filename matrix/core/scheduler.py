@@ -31,7 +31,7 @@ class MatrixScheduler(mesos.interface.Scheduler):
     for task in scheduled_tasks:
       task_info = mesos_pb2.TaskInfo()
       task_info.task_id.value = str(task.id)
-      task_info.slave_id.value = task.offer.slave_id.value
+      task_info.slave_id.value = task.slave_id
       task_info.name = task.name
       task_info.data = task.command
 
@@ -69,9 +69,9 @@ class MatrixScheduler(mesos.interface.Scheduler):
 
       tasks_info = []
       tasks_info.append(task_info)
-      driver.launchTasks(task.offer.id, tasks_info)
+      driver.launchTasks(task.offer_id, tasks_info)
       self.task_manager.move_to_next_state(task.id)
-      accept_offer_ids.append(task.offer.id)
+      accept_offer_ids.append(task.offer_id)
 
     for offer in offers:
       if offer.id not in accept_offer_ids:

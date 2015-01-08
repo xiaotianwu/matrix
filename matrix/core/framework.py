@@ -54,16 +54,16 @@ if __name__ == '__main__':
   framework = MatrixFramework()
   framework.install()
   framework.start()
-  time.sleep(20)
-  #print "add task"
-  #task = Task()
-  #task.id = 1
-  #task.name = "test"
-  #constraint = TaskConstraint()
-  #constraint.cpus = 1
-  #constraint.mem = 2048
-  #constraint.host = "MIS-BJ-6-5A2"
-  #task.constraint = constraint
-  #framework.add_task(task)
-  #time.sleep(60000)
+  time.sleep(5)
+  print "add task"
+  task = Task()
+  task.id = '1'
+  task.docker_image = 'cpdc/walle_monitor_0_2'
+  task.command = '/walle_monitor_0_2/monitor/main.py --kafka_hosts=223.203.199.153:9092,223.203.199.152:9092,223.203.199.150:9092,223.203.199.149:9092,223.203.199.148:9092 --topic=final-log --ip_mapping_file=/walle_monitor_0_2/monitor/ipmapping.conf'
+  task.name = "test"
+  task.constraint.cpus = 1
+  task.constraint.mem = 2048
+  task.constraint.host = "MIS-BJ-6-5A2"
+  framework.new(task)
+  time.sleep(60000)
   framework.stop()
