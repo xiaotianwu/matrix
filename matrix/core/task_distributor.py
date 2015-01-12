@@ -49,7 +49,7 @@ class TaskDistributor:
     for task in self.tasks:
       choose = False
       offer_id, slave_id, cpus, mem, hostname = None, None, None, None, None
-      if task.constraint.host is not None:# and not task.constraint.host.strip():
+      if task.constraint.host is not None and len(task.constraint.host) > 0:# and not task.constraint.host.strip():
         iterator = iter(self.offers_mapping)
         iterator.goto(self.offers_reverse_mapping[task.constraint.host])
         offer_id, slave_id, cpus, mem, hostname = iterator.get()

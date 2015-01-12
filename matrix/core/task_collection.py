@@ -2,23 +2,29 @@ __author__ = 'xiaotian.wu'
 
 from collections import deque
 
-from matrix.core.task import *
+from matrix.core.task import TaskState, TaskConstraint, TaskTransferInput, Task, task_to_json, json_to_task
 
 class TaskCollection:
-  def __init__(self):
+  def __init__(self, zk_task_trunk = None):
     self.pending_list = deque()
     self.scheduled_list = set()
     self.running_list = set()
     self.error_list = set()
     self.finish_list = set()
     self.task_set = {}
+    self.zk_task_trunk = zk_task_trunk
 
   def add(self, task):
-    if task.id is None:
-      raise Exception("task id is none")
+    if task.id == -1:
+      raise Exception("task id not filled")
     task.state = TaskState.Pending
     self.task_set[task.id] = task
     self.pending_list.append(task.id)
+
+    if self.zk_task_trunk is not None:
+      self.zk_task_trunk.update_task_node(
+        task.id,
+        task_to_json(task))
 
   def remove(self, task_id):
     if task_id in self.task_set:
@@ -36,6 +42,8 @@ class TaskCollection:
       else:
         raise Exception("unknown task state, task id %s %s" % (task_id, state))
       del self.task_set[task_id]
+      if self.zk_task_trunk is not None:
+        self.zk_task_trunk.remove_task_node(task_id)
 
   def move_to_next_state(self, task_id, input_action = None):
     if task_id not in self.task_set:
@@ -69,6 +77,11 @@ class TaskCollection:
     else:
       raise Exception("task_id: %s unknown state: %s"
                        %(task_id, self.task_set[task_id].state))
+
+    if self.zk_task_trunk is not None:
+      self.zk_task_trunk.update_task_node(
+        task_id,
+        self.serialize(self.task_set[task_id]))
 
 if __name__ == '__main__':
   import unittest

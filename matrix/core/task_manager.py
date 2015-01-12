@@ -6,8 +6,8 @@ from matrix.core.task_collection import TaskCollection
 from matrix.core.task_distributor import TaskDistributor
 
 class TaskManager:
-  def __init__(self):
-    self.task_collection = TaskCollection()
+  def __init__(self, zk_task_trunk = None):
+    self.task_collection = TaskCollection(zk_task_trunk)
 
   def add_list(self, tasks):
     for task in tasks:
