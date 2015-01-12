@@ -51,10 +51,10 @@ class Task:
     self.slave_id = -1
     self.executor_id = -1
 
-def task_to_json(task):
+def serialize_task(task):
   return json.dumps(task, default = object_to_dict)
 
-def json_to_task(json_str):
+def deserialize_task(json_str):
   return json.loads(json_str, object_hook = dict_to_object)
 
 if __name__ == '__main__':
@@ -72,9 +72,9 @@ if __name__ == '__main__':
       t1 = Task()
       t1.constraint.cpus = 2
       t1.constraint.mem = 3
-      t2 = task_to_json(t1)
+      t2 = serialize_task(t1)
       print t2
-      t3 = json_to_task(t2)
+      t3 = deserialize_task(t2)
       self.assertEqual(t1.constraint.cpus, t3.constraint.cpus)
       self.assertEqual(t1.constraint.mem, t3.constraint.mem)
 
