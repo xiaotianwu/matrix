@@ -1,5 +1,6 @@
 __author__ = 'xiaotian.wu@chinacache.com'
 
+import copy
 import json
 
 from matrix.core.util import Enum, object_to_dict, dict_to_object
@@ -25,7 +26,7 @@ class Task:
                id = -1,
                name = "",
                docker_image = "",
-               constraint = TaskConstraint(),
+               constraint = None,
                priority = TaskPriority.Low,
                property = [],
                state = TaskState.Pending,
@@ -36,7 +37,7 @@ class Task:
     self.id = id
     self.name = name
     self.docker_image = docker_image
-    self.constraint = constraint
+    self.constraint = TaskConstraint() if constraint is None else constraint
     self.priority = priority
     self.property = property
     self.state = state
