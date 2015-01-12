@@ -44,6 +44,8 @@ class TaskManager:
       del self.task_set[task_id]
 
   def move_to_next_state(self, task_id, input_action = None):
+    if task_id not in self.task_set:
+      raise Exception("task id: %s not in task set" % task_id)
     if self.task_set[task_id].state == TaskState.Pending:
       self.pending_list.remove(task_id)
       self.scheduled_list.add(task_id)
@@ -54,7 +56,7 @@ class TaskManager:
       self.task_set[task_id].state = TaskState.Running
     elif self.task_set[task_id].state == TaskState.Running:
       self.running_list.remove(task_id)
-      if input_action == "error":
+      if input_action == TaskTransferInput.Error:
         self.error_list.add(task_id)
         self.task_set[task_id].state = TaskState.Error
       else:
@@ -62,8 +64,10 @@ class TaskManager:
         self.task_set[task_id].state = TaskState.Finish
     elif self.task_set[task_id].state == TaskState.Error:
       self.error_list.remove(task_id)
-      if input_action == "reschedule":
-        self.pending_list.add(task_id)
+      if input_action == TaskTransferInput.Reschedule or \
+         input_action == TaskTransferInput.Recover:
+        self.pending_list.append(task_id)
+        self.task_set[task_id].clear_offer()
         self.task_set[task_id].state = TaskState.Pending
       else:
         self.finish_list.add(task_id)
@@ -71,12 +75,26 @@ class TaskManager:
     else:
       raise Exception("unsupported state")
 
+  def recover_tasks(self):
+    recover_tasks = []
+    for task_id in self.error_list:
+      if task_id not in self.task_set:
+        continue
+      if TaskProperty.AutoRecover in self.task_set[task_id].property:
+        recover_tasks.append(task_id)
+    for task_id in recover_tasks:
+      logger.info("recover task id: %s" % task_id)
+      self.move_to_next_state(task_id, TaskTransferInput.Recover)
+
   def schedule(self, offers):
+    self.recover_tasks()
     pending_tasks = []
     for task_id in self.pending_list:
+      if task_id not in self.task_set:
+        continue
       if self.task_set[task_id].state != TaskState.Pending:
         raise Exception("task id: %s is not pending state" % task_id)
-      self.task_set[task_id].offer = None
+      self.task_set[task_id].clear_offer()
       pending_tasks.append(self.task_set[task_id])
     logger.info('offers: %s' % offers)
     logger.info('pending tasks: %s' % pending_tasks)
@@ -89,7 +107,7 @@ class TaskManager:
     if task_id in self.task_set:
       return self.task_set[task_id]
     else:
-      raise Exception("task id: %s does not exist" % task_id)
+      return None
 
 if __name__ == '__main__':
   import unittest

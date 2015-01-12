@@ -3,8 +3,9 @@ __author__ = 'xiaotian.wu@chinacache.com'
 from matrix.core.util import Enum
 
 TaskPriority = Enum(['Low', 'Median', 'High', 'RealTime'])
-TaskProperty = Enum(['Stateless', 'Exclusive', 'AutoRestart'])
+TaskProperty = Enum(['Stateless', 'Exclusive', 'AutoRecover'])
 TaskState = Enum(['Pending', 'Scheduled', 'Running', 'Error', 'Finish'])
+TaskTransferInput = Enum(["Error", "Recover", "Reschedule"])
 
 class TaskConstraint:
   def __init__(self):
@@ -20,7 +21,7 @@ class Task:
     self.docker_image = None
     self.constraint = TaskConstraint()
     self.priority = None
-    self.property = None
+    self.property = []
     self.state = None
     self.strategy = None
     self.command = None
@@ -28,7 +29,19 @@ class Task:
     self.slave_id = None
     self.executor_id = None
 
+  def clear_offer(self):
+    self.offer_id = None
+    self.slave_id = None
+    self.executor_id = None
+
 if __name__ == '__main__':
-  task = Task()
-  task.priority = TaskPriority.Low
-  print task.priority
+  import unittest
+
+  class TaskTest(unittest.TestCase):
+    def testSet(self):
+      task = Task()
+      task.priority = TaskPriority.Low
+      print task.priority
+      print TaskTransferInput.error
+
+  unittest.main()

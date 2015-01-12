@@ -57,9 +57,12 @@ if __name__ == '__main__':
   time.sleep(5)
   print "add task"
   task = Task()
-  task.id = '1'
-  task.docker_image = 'cpdc/walle_monitor_0_2'
+  task.property.append(TaskProperty.AutoRecover)
+  task.id = 1
+  task.docker_image = 'cpdc/walle_monitor_0_2_2'
+  #task.docker_image = 'cpdc/mesos_executor_0_2_2'
   task.command = '/walle_monitor_0_2/monitor/main.py --kafka_hosts=223.203.199.153:9092,223.203.199.152:9092,223.203.199.150:9092,223.203.199.149:9092,223.203.199.148:9092 --topic=final-log --ip_mapping_file=/walle_monitor_0_2/monitor/ipmapping.conf'
+  #task.command = 'ls -l'
   task.name = "test"
   task.constraint.cpus = 1
   task.constraint.mem = 2048
