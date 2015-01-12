@@ -1,86 +1,33 @@
 __author__ = 'xiaotian.wu'
 
-from collections import deque
-
 from matrix.core.logger import logger
 from matrix.core.task import *
+from matrix.core.task_collection import TaskCollection
 from matrix.core.task_distributor import TaskDistributor
 
 class TaskManager:
   def __init__(self):
-    self.pending_list = deque()
-    self.scheduled_list = set()
-    self.running_list = set()
-    self.error_list = set()
-    self.finish_list = set()
-    self.task_set = {}
+    self.task_collection = TaskCollection()
 
   def add_list(self, tasks):
     for task in tasks:
-      self.add(task)
+      self.task_collection.add(task)
 
   def add(self, task):
-    if task.id is None:
-      raise Exception("task id is none")
-    task.state = TaskState.Pending
-    self.task_set[task.id] = task
-    self.pending_list.append(task.id)
+    self.task_collection.add(task)
 
   def remove(self, task_id):
-    if task_id in self.task_set:
-      state = self.task_set[task_id].state
-      if state == TaskState.Pending:
-        self.pending_list.remove(task_id)
-      elif state == TaskState.Scheduled:
-        self.scheduled_list.remove(task_id)
-      elif state == TaskState.Running:
-        self.running_list.remove(task_id)
-      elif state == TaskState.Error:
-        self.error_list.remove(task_id)
-      elif state == TaskState.Finish:
-        self.finish_list.remove(task_id)
-      else:
-        raise Exception("unknown task state, task id %s %s" % (task_id, state))
-      del self.task_set[task_id]
+    self.task_collection.remove(task_id)
 
   def move_to_next_state(self, task_id, input_action = None):
-    if task_id not in self.task_set:
-      raise Exception("task id: %s not in task set" % task_id)
-    if self.task_set[task_id].state == TaskState.Pending:
-      self.pending_list.remove(task_id)
-      self.scheduled_list.add(task_id)
-      self.task_set[task_id].state = TaskState.Scheduled
-    elif self.task_set[task_id].state == TaskState.Scheduled:
-      self.scheduled_list.remove(task_id)
-      self.running_list.add(task_id)
-      self.task_set[task_id].state = TaskState.Running
-    elif self.task_set[task_id].state == TaskState.Running:
-      self.running_list.remove(task_id)
-      if input_action == TaskTransferInput.Error:
-        self.error_list.add(task_id)
-        self.task_set[task_id].state = TaskState.Error
-      else:
-        self.finish_list.add(task_id)
-        self.task_set[task_id].state = TaskState.Finish
-    elif self.task_set[task_id].state == TaskState.Error:
-      self.error_list.remove(task_id)
-      if input_action == TaskTransferInput.Reschedule or \
-         input_action == TaskTransferInput.Recover:
-        self.pending_list.append(task_id)
-        self.task_set[task_id].clear_offer()
-        self.task_set[task_id].state = TaskState.Pending
-      else:
-        self.finish_list.add(task_id)
-        self.task_set[task_id].state = TaskState.Finish
-    else:
-      raise Exception("unsupported state")
+    self.task_collection.move_to_next_state(task_id)
 
   def recover_tasks(self):
     recover_tasks = []
-    for task_id in self.error_list:
-      if task_id not in self.task_set:
+    for task_id in self.task_collection.error_list:
+      if task_id not in self.task_collection.task_set:
         continue
-      if TaskProperty.AutoRecover in self.task_set[task_id].property:
+      if TaskProperty.AutoRecover in self.task_collection.task_set[task_id].property:
         recover_tasks.append(task_id)
     for task_id in recover_tasks:
       logger.info("recover task id: %s" % task_id)
@@ -89,13 +36,13 @@ class TaskManager:
   def schedule(self, offers):
     self.recover_tasks()
     pending_tasks = []
-    for task_id in self.pending_list:
-      if task_id not in self.task_set:
+    for task_id in self.task_collection.pending_list:
+      if task_id not in self.task_collection.task_set:
         continue
-      if self.task_set[task_id].state != TaskState.Pending:
+      if self.task_collection.task_set[task_id].state != TaskState.Pending:
         raise Exception("task id: %s is not pending state" % task_id)
-      self.task_set[task_id].clear_offer()
-      pending_tasks.append(self.task_set[task_id])
+      self.task_collection.task_set[task_id].clear_offer()
+      pending_tasks.append(self.task_collection.task_set[task_id])
     logger.info('offers: %s' % offers)
     logger.info('pending tasks: %s' % pending_tasks)
     distributor = TaskDistributor(offers, pending_tasks)
@@ -104,8 +51,8 @@ class TaskManager:
     return scheduled_tasks
 
   def get_task(self, task_id):
-    if task_id in self.task_set:
-      return self.task_set[task_id]
+    if task_id in self.task_collection.task_set:
+      return self.task_collection.task_set[task_id]
     else:
       return None
 
