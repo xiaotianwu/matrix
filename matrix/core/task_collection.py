@@ -103,12 +103,10 @@ class TaskCollection:
     if self.zookeeper_task_trunk is not None:
       self.zookeeper_task_trunk.update_task_node(
         task_id,
-        self.serialize(self.task_set[task_id]))
+        serialize_task(self.task_set[task_id]))
 
 if __name__ == '__main__':
   import unittest
-  import mesos.interface
-  from mesos.interface import mesos_pb2
 
   class TaskCollectionTest(unittest.TestCase):
     def testStateTransfer(self):

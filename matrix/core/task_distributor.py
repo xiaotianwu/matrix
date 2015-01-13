@@ -50,6 +50,8 @@ class TaskDistributor:
       choose = False
       offer_id, slave_id, cpus, mem, hostname = None, None, None, None, None
       if task.constraint.host is not None and len(task.constraint.host) > 0:# and not task.constraint.host.strip():
+        if task.constraint.host not in self.offers_reverse_mapping:
+          continue
         iterator = iter(self.offers_mapping)
         iterator.goto(self.offers_reverse_mapping[task.constraint.host])
         offer_id, slave_id, cpus, mem, hostname = iterator.get()
@@ -65,7 +67,8 @@ class TaskDistributor:
           choose = True
 
       if choose is True:
-        task.offer_id = offer_id
+        task.offer_id = offer_id.value
+        print "offer id -------------------------------------------", offer_id
         task.slave_id = slave_id
         scheduled_task.append(task)
         cpus -= task.constraint.cpus

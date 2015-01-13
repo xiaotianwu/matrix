@@ -10,9 +10,14 @@ from matrix.core.scheduler import MatrixScheduler
 from matrix.core.task import *
 from matrix.core.config import config
 from matrix.core.logger import logger
+from matrix.core.zookeeper_task_trunk import ZookeeperTaskTrunk
 
 class MatrixFramework:
-  def __init__(self):
+  def __init__(self, framework_name, framework_id, zk_hosts = None):
+    if zk_hosts is not None:
+      self.zk_task_trunk = ZookeeperTaskTrunk(framework_name, framework_id, zk_hosts)
+    else:
+      self.zk_task_trunk = None
     self.framework = mesos_pb2.FrameworkInfo()
     self.framework.user = ""
     self.framework.id.value = ""
@@ -20,7 +25,7 @@ class MatrixFramework:
     self.framework.name = "Matrix"
 
   def install(self):
-    self.scheduler = MatrixScheduler()
+    self.scheduler = MatrixScheduler(self.zk_task_trunk)
     host = config.get("mesos", "host")
     if len(host) == 0:
       raise Exception("host is empty")
@@ -51,7 +56,7 @@ class MatrixFramework:
     self.scheduler.delete(task_id)
 
 if __name__ == '__main__':
-  framework = MatrixFramework()
+  framework = MatrixFramework("MatrixTest", "1", "223.202.46.153:2181")
   framework.install()
   framework.start()
   time.sleep(5)

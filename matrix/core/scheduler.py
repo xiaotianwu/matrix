@@ -9,13 +9,19 @@ from matrix.core.task_manager import TaskManager
 from matrix.core.logger import logger
 
 class MatrixScheduler(mesos.interface.Scheduler):
-  def __init__(self):
-    self.task_manager = TaskManager()
+  def __init__(self, zk_task_trunk = None):
+    self.task_manager = TaskManager(zk_task_trunk)
     self.driver = None
     self.total_task = 10000
 
   def add(self, task):
     self.task_manager.add(task)
+
+  def get(self, task_id):
+    return self.task_manager.get_task(task_id)
+
+  def list(self):
+    pass
 
   def delete(self, task_id):
     self.task_manager.remove(task_id)
@@ -72,9 +78,11 @@ class MatrixScheduler(mesos.interface.Scheduler):
 
       tasks_info = []
       tasks_info.append(task_info)
-      driver.launchTasks(task.offer_id, tasks_info)
+      offer_id = mesos_pb2.OfferID()
+      offer_id.value = task.offer_id
+      driver.launchTasks(offer_id, tasks_info)
       self.task_manager.state_transfer(task.id)
-      accept_offer_ids.append(task.offer_id)
+      accept_offer_ids.append(offer_id)
 
     for offer in offers:
       if offer.id not in accept_offer_ids:
