@@ -38,8 +38,8 @@ class MatrixFramework:
     logger.info("stop framework")
     self.driver.stop()
 
-  def new(self, task):
-    self.scheduler.new(task)
+  def add(self, task):
+    self.scheduler.add(task)
 
   def get(self, task_id):
     pass
@@ -67,6 +67,6 @@ if __name__ == '__main__':
   task.constraint.cpus = 1
   task.constraint.mem = 2048
   task.constraint.host = "MIS-BJ-6-5A2"
-  framework.new(task)
+  framework.add(task)
   time.sleep(60000)
   framework.stop()

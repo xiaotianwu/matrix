@@ -9,20 +9,22 @@ from matrix.core.task_manager import TaskManager
 from matrix.core.logger import logger
 
 class MatrixScheduler(mesos.interface.Scheduler):
-  total_task = 10000
-
   def __init__(self):
     self.task_manager = TaskManager()
+    self.driver = None
+    self.total_task = 10000
 
-  def new(self, task):
+  def add(self, task):
     self.task_manager.add(task)
 
   def delete(self, task_id):
     self.task_manager.remove(task_id)
+    if self.driver is not None:
+      self.driver.killTask(task_id)
 
   def registered(self, driver, frameworkId, masterInfo):
     logger.info("registered framework id %s" % frameworkId.value)
-    self._driver = driver
+    self.driver = driver
 
   def resourceOffers(self, driver, offers):
     logger.info('rescource offers from %s' % [offer.hostname for offer in offers])
@@ -71,7 +73,7 @@ class MatrixScheduler(mesos.interface.Scheduler):
       tasks_info = []
       tasks_info.append(task_info)
       driver.launchTasks(task.offer_id, tasks_info)
-      self.task_manager.move_to_next_state(task.id)
+      self.task_manager.state_transfer(task.id)
       accept_offer_ids.append(task.offer_id)
 
     for offer in offers:
@@ -86,21 +88,21 @@ class MatrixScheduler(mesos.interface.Scheduler):
       logger.info('slave id: %s, executor id: %s' % (task.slave_id, task.executor_id))
 
       if update.state == mesos_pb2.TASK_RUNNING:
-        self.task_manager.move_to_next_state(task.id)
+        self.task_manager.state_transfer(task.id)
         logger.info("task %s is running" % update.task_id.value)
 
       if update.state == mesos_pb2.TASK_FINISHED:
-        self.task_manager.move_to_next_state(task.id)
+        self.task_manager.state_transfer(task.id)
         logger.info("task %s finished, message: %s" % (update.task_id.value, update.message))
 
       if update.state == mesos_pb2.TASK_FAILED:
         task.clear_offer()
-        self.task_manager.move_to_next_state(task.id, TaskTransferInput.Error)
+        self.task_manager.state_transfer(task.id, TaskTransferInput.Error)
         logger.error("task %s failed, error str: %s" % (update.task_id.value, update.message))
 
       if update.state == mesos_pb2.TASK_KILLED or update.state == mesos_pb2.TASK_LOST:
         task.clear_offer()
-        self.task_manager.move_to_next_state(task.id, TaskTransferInput.Error)
+        self.task_manager.state_transfer(task.id, TaskTransferInput.Error)
         logger.error("task %s killed, state: %s" % (update.task_id.value, update.state))
     else:
       logger.error("task id: %s does not exist" % update.task_id.value)

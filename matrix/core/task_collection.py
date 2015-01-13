@@ -67,7 +67,7 @@ class TaskCollection:
       if self.zookeeper_task_trunk is not None:
         self.zookeeper_task_trunk.remove_task_node(task_id)
 
-  def move_to_next_state(self, task_id, input_action = None):
+  def state_transfer(self, task_id, input_action = None):
     if task_id not in self.task_set:
       raise Exception("task id: %s not in task set" % task_id)
     if self.task_set[task_id].state == TaskState.Pending:
@@ -119,46 +119,32 @@ if __name__ == '__main__':
       task_collection = TaskCollection()
       task_collection.add(task)
       self.assertEqual(task.state, TaskState.Pending)
-      task_collection.move_to_next_state(1)
+      task_collection.state_transfer(1)
       self.assertEqual(task.state, TaskState.Scheduled)
-      task_collection.move_to_next_state(1)
+      task_collection.state_transfer(1)
       self.assertEqual(task.state, TaskState.Running)
-      task_collection.move_to_next_state(1)
+      task_collection.state_transfer(1)
       self.assertEqual(task.state, TaskState.Finish)
       task_collection.remove(1)
 
     def testZKTrunk(self):
-      t1 = Task()
-      t1.constraint.cpus = 2
-      t1.constraint.mem = 3
-      t2 = serialize_task(t1)
-      print t2
-      t3 = deserialize_task(t2)
-      self.assertEqual(t1.constraint.cpus, t3.constraint.cpus)
-      self.assertEqual(t1.constraint.mem, t3.constraint.mem)
-
-#      task1 = Task()
-#      task1.id = 1
-#      task1.constraint.cpus = 1
-#      task1.constraint.mem = 1024
-#      task2 = Task()
-#      task2.id = 2
-#      task2.constraint.cpus = 2
-#      task2.constraint.mem = 2048
-#      zk_trunk = ZookeeperTaskTrunk("MatrixTest", "1", "223.202.46.153:2181")
-#      task_collection = TaskCollection(zk_trunk)  
-#      task_collection.add(task1)
-#      task_collection.add(task2)
-#      # just for unittest, do not call it directly
-#      data1 = zk_trunk.get_task_data(1)
-#      print 'data1 =', data1
-#      print deserialize_task(data1)
-#      # print zk_trunk.get_task_data(2)
-#      # test init from zk
-#      # task_collection2 = TaskCollection(zk_trunk)
-#      # print task_collection2.pending_list
-#      # task_collection2.init_from_zookeeper()
-#      # print task_collection2.pending_list
-#      zk_trunk.clear_metadata()
+      task1 = Task()
+      task1.id = 1
+      task1.constraint.cpus = 1
+      task1.constraint.mem = 1024
+      task2 = Task()
+      task2.id = 2
+      task2.constraint.cpus = 2
+      task2.constraint.mem = 2048
+      zk_trunk = ZookeeperTaskTrunk("MatrixTest", "1", "223.202.46.153:2181")
+      task_collection = TaskCollection(zk_trunk)  
+      task_collection.add(task1)
+      task_collection.add(task2)
+      # test init from zk
+      task_collection2 = TaskCollection(zk_trunk)
+      print task_collection2.pending_list
+      task_collection2.init_from_zookeeper()
+      print task_collection2.pending_list
+      zk_trunk.clear_metadata()
 
   unittest.main()

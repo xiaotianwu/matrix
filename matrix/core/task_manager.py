@@ -19,8 +19,8 @@ class TaskManager:
   def remove(self, task_id):
     self.task_collection.remove(task_id)
 
-  def move_to_next_state(self, task_id, input_action = None):
-    self.task_collection.move_to_next_state(task_id)
+  def state_transfer(self, task_id, input_action = None):
+    self.task_collection.state_transfer(task_id)
 
   def recover_tasks(self):
     recover_tasks = []
@@ -31,7 +31,7 @@ class TaskManager:
         recover_tasks.append(task_id)
     for task_id in recover_tasks:
       logger.info("recover task id: %s" % task_id)
-      self.move_to_next_state(task_id, TaskTransferInput.Recover)
+      self.state_transfer(task_id, TaskTransferInput.Recover)
 
   def schedule(self, offers):
     self.recover_tasks()
@@ -71,11 +71,11 @@ if __name__ == '__main__':
       task_manager = TaskManager()
       task_manager.add(task)
       self.assertEqual(task.state, TaskState.Pending)
-      task_manager.move_to_next_state(1)
+      task_manager.state_transfer(1)
       self.assertEqual(task.state, TaskState.Scheduled)
-      task_manager.move_to_next_state(1)
+      task_manager.state_transfer(1)
       self.assertEqual(task.state, TaskState.Running)
-      task_manager.move_to_next_state(1)
+      task_manager.state_transfer(1)
       self.assertEqual(task.state, TaskState.Finish)
       task_manager.remove(1)
 

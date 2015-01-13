@@ -21,10 +21,9 @@ def dict_to_object(dictionary):
   if '__class__' in dictionary:
     class_name = dictionary.pop('__class__')
     module_name = dictionary.pop('__module__')
-    _module = __import__(module_name)
+    _module = __import__(module_name, fromlist = [module_name.split('.')[0]])
     _class = getattr(_module, class_name)
     args = dict((k.encode('ascii'), v) for k, v in dictionary.items())
-    print args
     instance = _class(**args)
   else:
     instance = dictionary
