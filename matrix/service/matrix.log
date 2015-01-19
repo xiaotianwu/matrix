@@ -1,0 +1,145 @@
+[2015-01-19 06:10:37,545](INFO)kazoo.client : Connecting to 223.202.46.132:30000
+[2015-01-19 06:10:37,546](WARNING)kazoo.client : Connection dropped: socket connection error: Connection refused
+[2015-01-19 06:10:38,277](INFO)kazoo.client : Connecting to 223.202.46.132:30000
+[2015-01-19 06:10:38,277](WARNING)kazoo.client : Connection dropped: socket connection error: Connection refused
+[2015-01-19 06:10:39,029](INFO)kazoo.client : Connecting to 223.202.46.132:30000
+[2015-01-19 06:10:39,030](WARNING)kazoo.client : Connection dropped: socket connection error: Connection refused
+[2015-01-19 06:10:39,481](INFO)kazoo.client : Connecting to 223.202.46.132:30000
+[2015-01-19 06:10:39,481](WARNING)kazoo.client : Connection dropped: socket connection error: Connection refused
+[2015-01-19 06:10:41,044](INFO)kazoo.client : Connecting to 223.202.46.132:30000
+[2015-01-19 06:10:41,045](WARNING)kazoo.client : Connection dropped: socket connection error: Connection refused
+[2015-01-19 06:10:43,350](INFO)kazoo.client : Connecting to 223.202.46.132:30000
+[2015-01-19 06:10:43,350](WARNING)kazoo.client : Connection dropped: socket connection error: Connection refused
+[2015-01-19 06:10:46,256](WARNING)kazoo.client : Failed connecting to Zookeeper within the connection retry policy.
+[2015-01-19 06:10:46,256](INFO)kazoo.client : Zookeeper session lost, state: CLOSED
+[2015-01-19 06:12:38,333](INFO)kazoo.client : Connecting to 223.202.46.153:2181
+[2015-01-19 06:12:38,346](INFO)kazoo.client : Zookeeper connection established, state: CONNECTED
+[2015-01-19 06:12:38,372](INFO)kazoo.client : Closing connection to 223.202.46.153:2181
+[2015-01-19 06:12:38,372](INFO)kazoo.client : Zookeeper session lost, state: CLOSED
+[2015-01-19 06:13:05,993](INFO)kazoo.client : Connecting to 223.202.46.153:2181
+[2015-01-19 06:13:06,011](INFO)kazoo.client : Zookeeper connection established, state: CONNECTED
+[2015-01-19 06:13:06,026](INFO)log : install framework on mesos host: 223.202.46.132:5050
+[2015-01-19 06:13:06,033](INFO)log : framework install ok
+[2015-01-19 06:13:06,035](INFO)log : start server at host 223.202.46.132:30000
+[2015-01-19 06:13:06,044](INFO)log : registered framework id 20141216-140810-2217659103-5050-32112-0122
+[2015-01-19 06:18:50,514](INFO)kazoo.client : Connecting to 223.202.46.153:2181
+[2015-01-19 06:18:50,525](INFO)kazoo.client : Zookeeper connection established, state: CONNECTED
+[2015-01-19 06:18:50,531](INFO)log : install framework on mesos host: 223.202.46.132:5050
+[2015-01-19 06:18:50,537](INFO)log : framework install ok
+[2015-01-19 06:18:50,540](INFO)log : start server at host 223.202.46.132:30000
+[2015-01-19 06:18:50,548](INFO)log : registered framework id 20141216-140810-2217659103-5050-32112-0123
+[2015-01-19 06:20:24,999](INFO)kazoo.client : Connecting to 223.202.46.153:2181
+[2015-01-19 06:20:25,013](INFO)kazoo.client : Zookeeper connection established, state: CONNECTED
+[2015-01-19 06:20:25,016](INFO)log : install framework on mesos host: 223.202.46.132:5050
+[2015-01-19 06:20:25,021](INFO)log : framework install ok
+[2015-01-19 06:20:25,023](INFO)log : start server at host 223.202.46.132:30000
+[2015-01-19 06:20:25,033](INFO)log : registered framework id 20141216-140810-2217659103-5050-32112-0124
+[2015-01-19 06:26:37,378](INFO)kazoo.client : Connecting to 223.202.46.153:2181
+[2015-01-19 06:26:37,392](INFO)kazoo.client : Zookeeper connection established, state: CONNECTED
+[2015-01-19 06:26:37,394](INFO)log : install framework on mesos host: 223.202.46.132:5050
+[2015-01-19 06:26:37,400](INFO)log : framework install ok
+[2015-01-19 06:26:37,402](INFO)log : start server at host 223.202.46.132:30000
+[2015-01-19 06:26:37,410](INFO)log : registered framework id 20141216-140810-2217659103-5050-32112-0125
+[2015-01-19 06:29:27,561](INFO)kazoo.client : Connecting to 223.202.46.153:2181
+[2015-01-19 06:29:27,579](INFO)kazoo.client : Zookeeper connection established, state: CONNECTED
+[2015-01-19 06:29:27,594](INFO)log : install framework on mesos host: 223.202.46.132:5050
+[2015-01-19 06:29:27,600](INFO)log : framework install ok
+[2015-01-19 06:29:27,602](INFO)log : start server at host 223.202.46.132:30000
+[2015-01-19 06:29:27,611](INFO)log : registered framework id 20141216-140810-2217659103-5050-32112-0126
+[2015-01-19 06:29:32,972](INFO)log : assign task id: 1 to offer id: 20141216-140810-2217659103-5050-32112-O1138438, slave id: 20141216-140810-2217659103-5050-32112-S142
+[2015-01-19 06:29:34,419](INFO)log : update task id: 1
+[2015-01-19 06:29:34,419](INFO)log : slave id: 20141216-140810-2217659103-5050-32112-S142, executor id: -1
+[2015-01-19 06:29:34,435](INFO)log : task 1 is running
+[2015-01-19 06:55:18,000](INFO)log : assign task id: 1 to offer id: 20141216-140810-2217659103-5050-32112-O1140756, slave id: 20141216-140810-2217659103-5050-32112-S98
+[2015-01-19 06:55:18,023](INFO)log : update task id: 1
+[2015-01-19 06:55:18,023](INFO)log : slave id: 20141216-140810-2217659103-5050-32112-S98, executor id: -1
+[2015-01-19 06:55:18,030](ERROR)log : task 1 killed, state: 5
+[2015-01-19 06:55:33,724](INFO)kazoo.client : Connecting to 223.202.46.153:2181
+[2015-01-19 06:55:33,737](INFO)kazoo.client : Zookeeper connection established, state: CONNECTED
+[2015-01-19 06:55:33,741](INFO)log : install framework on mesos host: 223.202.46.132:5050
+[2015-01-19 06:55:33,748](INFO)log : framework install ok
+[2015-01-19 06:55:33,750](INFO)log : start server at host 223.202.46.132:30000
+[2015-01-19 06:55:33,758](INFO)log : registered framework id 20141216-140810-2217659103-5050-32112-0127
+[2015-01-19 06:55:51,058](INFO)log : assign task id: 1 to offer id: 20141216-140810-2217659103-5050-32112-O1140809, slave id: 20141216-140810-2217659103-5050-32112-S142
+[2015-01-19 06:55:52,545](INFO)log : update task id: 1
+[2015-01-19 06:55:52,546](INFO)log : slave id: 20141216-140810-2217659103-5050-32112-S142, executor id: -1
+[2015-01-19 06:55:52,556](INFO)log : task 1 is running
+[2015-01-19 06:56:21,118](INFO)log : assign task id: 2 to offer id: 20141216-140810-2217659103-5050-32112-O1140855, slave id: 20141216-140810-2217659103-5050-32112-S98
+[2015-01-19 06:56:22,421](INFO)log : update task id: 2
+[2015-01-19 06:56:22,422](INFO)log : slave id: 20141216-140810-2217659103-5050-32112-S98, executor id: -1
+[2015-01-19 06:56:22,437](INFO)log : task 2 is running
+[2015-01-19 06:57:00,797](INFO)kazoo.client : Connecting to 223.202.46.153:2181
+[2015-01-19 06:57:00,819](INFO)kazoo.client : Zookeeper connection established, state: CONNECTED
+[2015-01-19 06:57:00,831](INFO)log : install framework on mesos host: 223.202.46.132:5050
+[2015-01-19 06:57:00,838](INFO)log : framework install ok
+[2015-01-19 06:57:00,840](INFO)log : start server at host 223.202.46.132:30000
+[2015-01-19 06:57:00,848](INFO)log : registered framework id 20141216-140810-2217659103-5050-32112-0128
+[2015-01-19 06:57:12,207](INFO)log : assign task id: 1 to offer id: 20141216-140810-2217659103-5050-32112-O1140925, slave id: 20141216-140810-2217659103-5050-32112-S142
+[2015-01-19 06:57:13,825](INFO)log : update task id: 1
+[2015-01-19 06:57:13,836](INFO)log : slave id: 20141216-140810-2217659103-5050-32112-S142, executor id: -1
+[2015-01-19 06:57:13,852](INFO)log : task 1 is running
+[2015-01-19 08:09:41,540](INFO)log : assign task id: 2 to offer id: 20141216-140810-2217659103-5050-32112-O1147429, slave id: 20141216-140810-2217659103-5050-32112-S98
+[2015-01-19 08:09:42,938](INFO)log : update task id: 2
+[2015-01-19 08:09:42,939](INFO)log : slave id: 20141216-140810-2217659103-5050-32112-S98, executor id: -1
+[2015-01-19 08:09:42,947](INFO)log : task 2 is running
+[2015-01-19 08:09:42,949](INFO)log : update task id: 2
+[2015-01-19 08:09:42,949](INFO)log : slave id: 20141216-140810-2217659103-5050-32112-S98, executor id: -1
+[2015-01-19 08:09:42,963](INFO)log : task 2 finished, message: 
+[2015-01-19 08:27:01,476](INFO)log : assign task id: 2 to offer id: 20141216-140810-2217659103-5050-32112-O1148991, slave id: 20141216-140810-2217659103-5050-32112-S98
+[2015-01-19 08:27:03,452](INFO)log : update task id: 2
+[2015-01-19 08:27:03,453](INFO)log : slave id: 20141216-140810-2217659103-5050-32112-S98, executor id: -1
+[2015-01-19 08:27:03,462](INFO)log : task 2 is running
+[2015-01-19 08:27:03,464](INFO)log : update task id: 2
+[2015-01-19 08:27:03,464](INFO)log : slave id: 20141216-140810-2217659103-5050-32112-S98, executor id: -1
+[2015-01-19 08:27:03,475](INFO)log : task 2 finished, message: 
+[2015-01-19 08:28:31,647](INFO)log : assign task id: 2 to offer id: 20141216-140810-2217659103-5050-32112-O1149128, slave id: 20141216-140810-2217659103-5050-32112-S98
+[2015-01-19 08:28:31,675](INFO)log : update task id: 2
+[2015-01-19 08:28:31,675](INFO)log : slave id: 20141216-140810-2217659103-5050-32112-S98, executor id: -1
+[2015-01-19 08:28:31,710](INFO)log : task 2 is running
+[2015-01-19 08:28:31,712](INFO)log : update task id: 2
+[2015-01-19 08:28:31,713](INFO)log : slave id: 20141216-140810-2217659103-5050-32112-S98, executor id: -1
+[2015-01-19 08:28:31,730](INFO)log : task 2 finished, message: 
+[2015-01-19 08:30:49,905](INFO)log : assign task id: 2 to offer id: 20141216-140810-2217659103-5050-32112-O1149334, slave id: 20141216-140810-2217659103-5050-32112-S98
+[2015-01-19 08:30:49,935](INFO)log : update task id: 2
+[2015-01-19 08:30:49,935](INFO)log : slave id: 20141216-140810-2217659103-5050-32112-S98, executor id: -1
+[2015-01-19 08:30:49,944](INFO)log : task 2 is running
+[2015-01-19 08:30:49,984](INFO)log : update task id: 2
+[2015-01-19 08:30:49,984](INFO)log : slave id: 20141216-140810-2217659103-5050-32112-S98, executor id: -1
+[2015-01-19 08:30:49,998](INFO)log : task 2 finished, message: Commands:
+	activate
+	classpath
+	deactivate
+	dev-zookeeper
+	drpc
+	help
+	jar
+	kill
+	list
+	localconfvalue
+	logviewer
+	monitor
+	nimbus
+	rebalance
+	remoteconfvalue
+	repl
+	shell
+	supervisor
+	ui
+	version
+
+Help: 
+	help 
+	help <command>
+
+Documentation for the storm client can be found at http://storm.incubator.apache.org/documentation/Command-line-client.html
+
+Configs can be overridden using one or more -c flags, e.g. "storm list -c nimbus.host=nimbus.mycompany.com"
+
+
+[2015-01-19 08:31:31,990](INFO)log : assign task id: 2 to offer id: 20141216-140810-2217659103-5050-32112-O1149397, slave id: 20141216-140810-2217659103-5050-32112-S98
+[2015-01-19 08:31:32,027](INFO)log : update task id: 2
+[2015-01-19 08:31:32,027](INFO)log : slave id: 20141216-140810-2217659103-5050-32112-S98, executor id: -1
+[2015-01-19 08:31:32,043](INFO)log : task 2 is running
+[2015-01-19 08:31:32,094](INFO)log : update task id: 2
+[2015-01-19 08:31:32,094](INFO)log : slave id: 20141216-140810-2217659103-5050-32112-S98, executor id: -1
+[2015-01-19 08:31:32,111](INFO)log : task 2 finished, message: 
