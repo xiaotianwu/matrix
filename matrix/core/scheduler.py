@@ -33,7 +33,7 @@ class MatrixScheduler(mesos.interface.Scheduler):
     self.driver = driver
 
   def resourceOffers(self, driver, offers):
-    logger.info('rescource offers from %s' % [offer.hostname for offer in offers])
+    logger.debug('rescource offers from %s' % [offer.hostname for offer in offers])
     scheduled_tasks = self.task_manager.schedule(offers)
 
     accept_offer_ids = []

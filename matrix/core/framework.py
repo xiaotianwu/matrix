@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 __author__ = 'xiaotian.wu@chinacache.com'
 
 import os
@@ -64,14 +66,14 @@ if __name__ == '__main__':
   task = Task()
   task.property.append(TaskProperty.AutoRecover)
   task.id = 1
-  task.docker_image = 'cpdc/walle_monitor_0_2_2'
+  task.docker_image = 'cpdc/walle_monitor'
   #task.docker_image = 'cpdc/mesos_executor_0_2_2'
-  task.command = '/walle_monitor_0_2/monitor/main.py --kafka_hosts=223.203.199.153:9092,223.203.199.152:9092,223.203.199.150:9092,223.203.199.149:9092,223.203.199.148:9092 --topic=final-log --ip_mapping_file=/walle_monitor_0_2/monitor/ipmapping.conf'
+  task.command = '/walle_monitor_0_2_1/monitor/main.py --kafka_hosts=223.203.199.153:9092,223.203.199.152:9092,223.203.199.150:9092,223.203.199.149:9092,223.203.199.148:9092 --topic=final-log --ip_mapping_file=/walle_monitor_0_2_1/monitor/ipmapping.conf'
   #task.command = 'ls -l'
   task.name = "test"
   task.constraint.cpus = 1
   task.constraint.mem = 2048
   task.constraint.host = "MIS-BJ-6-5A2"
   framework.add(task)
-  time.sleep(60000)
+  time.sleep(6000000)
   framework.stop()

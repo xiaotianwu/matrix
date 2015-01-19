@@ -28,12 +28,12 @@ class TaskDistributor:
       self.offers_reverse_mapping[offer.hostname] = weight
 
   def debug_info(self):
-    logger.info('--------------------offers mapping-------------------')
+    logger.debug('--------------------offers mapping-------------------')
     for i in self.offers_mapping.iternodes():
-      logger.info(str(i.key) + '\t' + str(i.value))
-    logger.info('------------offers reverse mapping-------------------')
+      logger.debug(str(i.key) + '\t' + str(i.value))
+    logger.debug('------------offers reverse mapping-------------------')
     for key in self.offers_reverse_mapping.keys():
-      logger.info(str(key) + '\t' + str(self.offers_reverse_mapping[key]))
+      logger.debug(str(key) + '\t' + str(self.offers_reverse_mapping[key]))
 
   def calculate_weight(self, cpus, mem): 
     weight = -(cpus * CPU_FACTOR + mem / 1024 * MEM_FACTOR)
@@ -68,7 +68,6 @@ class TaskDistributor:
 
       if choose is True:
         task.offer_id = offer_id.value
-        print "offer id -------------------------------------------", offer_id
         task.slave_id = slave_id
         scheduled_task.append(task)
         cpus -= task.constraint.cpus

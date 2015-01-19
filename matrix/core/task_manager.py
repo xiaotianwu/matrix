@@ -43,11 +43,11 @@ class TaskManager:
         raise Exception("task id: %s is not pending state" % task_id)
       self.task_collection.task_set[task_id].clear_offer()
       pending_tasks.append(self.task_collection.task_set[task_id])
-    logger.info('offers: %s' % offers)
-    logger.info('pending tasks: %s' % pending_tasks)
+    logger.debug('offers: %s' % offers)
+    logger.debug('pending tasks: %s' % pending_tasks)
     distributor = TaskDistributor(offers, pending_tasks)
     scheduled_tasks = distributor.assign()
-    logger.info('scheduled tasks: %s' % scheduled_tasks)
+    logger.debug('scheduled tasks: %s' % scheduled_tasks)
     return scheduled_tasks
 
   def get_task(self, task_id):
