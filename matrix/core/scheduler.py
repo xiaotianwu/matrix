@@ -9,24 +9,28 @@ from matrix.core.task_manager import TaskManager
 from matrix.core.logger import logger
 
 class MatrixScheduler(mesos.interface.Scheduler):
-  def __init__(self, zk_task_trunk = None):
-    self.task_manager = TaskManager(zk_task_trunk)
+  def __init__(self, task_pickler = None):
+    self.task_manager = TaskManager(task_pickler)
     self.driver = None
     self.total_task = 10000
+    self.task_number = 0
 
   def add(self, task):
-    self.task_manager.add(task)
+    return self.task_manager.add(task)
 
   def get(self, task_id):
     return self.task_manager.get_task(task_id)
 
   def list(self):
-    pass
+    raise Exception("not implemented yet")
 
   def delete(self, task_id):
-    self.task_manager.remove(task_id)
     if self.driver is not None:
       self.driver.killTask(task_id)
+    else:
+      logger.error("Matrix driver not initialized yet")
+      return
+    self.task_manager.remove(task_id)
 
   def registered(self, driver, frameworkId, masterInfo):
     logger.info("registered framework id %s" % frameworkId.value)
@@ -83,6 +87,7 @@ class MatrixScheduler(mesos.interface.Scheduler):
       driver.launchTasks(offer_id, tasks_info)
       self.task_manager.state_transfer(task.id)
       accept_offer_ids.append(offer_id)
+      self.task_number += 1
 
     for offer in offers:
       if offer.id not in accept_offer_ids:

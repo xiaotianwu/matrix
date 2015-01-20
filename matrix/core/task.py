@@ -1,6 +1,5 @@
 __author__ = 'xiaotian.wu@chinacache.com'
 
-import copy
 import json
 
 from matrix.core.util import Enum, object_to_dict, dict_to_object
@@ -20,6 +19,10 @@ class TaskConstraint:
     self.mem = mem
     self.rack = rack
     self.host = host
+
+  def __str__(self):
+    return "cpus: %s, memory: %s, rack: %s, host: %s" \
+           % (self.cpus, self.mem, self.rack, self.host)
 
 class Task:
   def __init__(self,
@@ -45,6 +48,14 @@ class Task:
     self.offer_id = offer_id
     self.slave_id = slave_id
     self.executor_id = executor_id
+
+  def __str__(self):
+    return "id: %s, name: %s, docker image: %s, constraint: {%s}" \
+           % (self.id, self.name, self.docker_image, str(self.constraint)) + \
+           " priority: %s, property: %s, state: %s, command: %s:" \
+           % (self.priority, self.property, self.state, self.command) + \
+           " offer id: %s, slave id: %s, executor id: %s" \
+           % (self.offer_id, self.slave_id, self.executor_id)
 
   def clear_offer(self):
     self.offer_id = -1
@@ -77,5 +88,6 @@ if __name__ == '__main__':
       t3 = deserialize_task(t2)
       self.assertEqual(t1.constraint.cpus, t3.constraint.cpus)
       self.assertEqual(t1.constraint.mem, t3.constraint.mem)
+      print str(t3)
 
   unittest.main()

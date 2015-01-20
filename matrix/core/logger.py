@@ -10,7 +10,7 @@ if not os.path.exists(logging_conf):
     raise Exception("logging.conf doesn't exist")
 
 logging.config.fileConfig(logging_conf)
-logger = logging.getLogger("log")
+logger = logging.getLogger("matrix")
 
 if __name__ == '__main__':
     logger.info("hello world")

@@ -1,5 +1,6 @@
 __author__ = 'xiaotian.wu@chinacache.com'
 
+import logging
 import rbtree
 
 from matrix.core.logger import logger
@@ -7,38 +8,39 @@ from matrix.core.offer import get_cpus_from_offer, get_mem_from_offer
 from matrix.core.task import Task
 
 CPU_FACTOR = 0.6
-MEM_FACTOR = 0.4
+MEM_FACTOR = 1 - CPU_FACTOR
 
 class TaskDistributor:
   def __init__(self, offers, tasks):
     self.offers = offers
     self.tasks = tasks
-    self.offers_mapping = rbtree.rbtree()
-    self.offers_reverse_mapping = {}
+    self.offer_map = rbtree.rbtree()
+    self.reverse_offer_map = {}
     for offer in self.offers:
       logger.debug("offer detail: %s" % offer)
       cpus = get_cpus_from_offer(offer)
       mem = get_mem_from_offer(offer)
       weight = self.calculate_weight(cpus, mem)
-      self.offers_mapping[weight] = (offer.id,
-                                     offer.slave_id.value,
-                                     cpus,
-                                     mem,
-                                     offer.hostname)
-      self.offers_reverse_mapping[offer.hostname] = weight
+      self.offer_map[weight] = (offer.id,
+                                offer.slave_id.value,
+                                cpus,
+                                mem,
+                                offer.hostname)
+      self.reverse_offer_map[offer.hostname] = weight
 
-  def debug_info(self):
-    logger.debug('--------------------offers mapping-------------------')
-    for i in self.offers_mapping.iternodes():
-      logger.debug(str(i.key) + '\t' + str(i.value))
-    logger.debug('------------offers reverse mapping-------------------')
-    for key in self.offers_reverse_mapping.keys():
-      logger.debug(str(key) + '\t' + str(self.offers_reverse_mapping[key]))
+  def offer_map_debug_info(self):
+    if logger.isEnabledFor(logging.DEBUG):
+      logger.debug('--------------------offers mapping-------------------')
+      for i in self.offer_map.iternodes():
+        logger.debug(str(i.key) + '\t' + str(i.value))
+      logger.debug('------------offers reverse mapping-------------------')
+      for key in self.reverse_offer_map.keys():
+        logger.debug(str(key) + '\t' + str(self.reverse_offer_map[key]))
 
   def calculate_weight(self, cpus, mem): 
     weight = -(cpus * CPU_FACTOR + mem / 1024 * MEM_FACTOR)
     # avoid same value appeared in rb tree, the ealier offer will have smaller weight
-    while self.offers_mapping.has_key(weight):
+    while self.offer_map.has_key(weight):
       weight += 0.0001
     return weight
 
@@ -49,11 +51,11 @@ class TaskDistributor:
     for task in self.tasks:
       choose = False
       offer_id, slave_id, cpus, mem, hostname = None, None, None, None, None
-      if task.constraint.host is not None and len(task.constraint.host) > 0:# and not task.constraint.host.strip():
-        if task.constraint.host not in self.offers_reverse_mapping:
+      if task.constraint.host is not None and len(task.constraint.host) > 0:
+        if task.constraint.host not in self.reverse_offer_map:
           continue
-        iterator = iter(self.offers_mapping)
-        iterator.goto(self.offers_reverse_mapping[task.constraint.host])
+        iterator = iter(self.offer_map)
+        iterator.goto(self.reverse_offer_map[task.constraint.host])
         offer_id, slave_id, cpus, mem, hostname = iterator.get()
         try:
           iterator.delete()
@@ -62,7 +64,7 @@ class TaskDistributor:
         if cpus >= task.constraint.cpus and mem >= task.constraint.mem:
           choose = True
       else:
-        offer_id, slave_id, cpus, mem, hostname = self.offers_mapping.pop()
+        offer_id, slave_id, cpus, mem, hostname = self.offer_map.pop()
         if cpus >= task.constraint.cpus and mem >= task.constraint.mem:
           choose = True
 
@@ -75,9 +77,9 @@ class TaskDistributor:
         logger.info("assign task id: %s to offer id: %s, slave id: %s"
                     %(task.id, task.offer_id, task.slave_id))
         weight = self.calculate_weight(cpus, mem)
-        self.offers_mapping[weight] = (offer_id, slave_id, cpus, mem, hostname)
-        self.offers_reverse_mapping[hostname] = weight
-        self.debug_info()
+        self.offer_map[weight] = (offer_id, slave_id, cpus, mem, hostname)
+        self.reverse_offer_map[hostname] = weight
+        self.offer_map_debug_info()
 
     return scheduled_task
 
@@ -129,7 +131,7 @@ if __name__ == '__main__':
 
     def testInialize(self):
       task_distributor = TaskDistributor(self.offers, None)
-      task_distributor.debug_info()
+      task_distributor.offer_map_debug_info()
 
     def testDistribution1(self):
       task1 = Task()
@@ -148,9 +150,9 @@ if __name__ == '__main__':
       offers = copy.deepcopy(self.offers)
       task_distributor = TaskDistributor(offers, tasks)
       task_distributor.assign()
-      self.assertEqual(task1.offer_id.value, '3')
-      self.assertEqual(task2.offer_id.value, '2')
-      self.assertEqual(task3.offer_id.value, '1')
+      self.assertEqual(task1.offer_id, '3')
+      self.assertEqual(task2.offer_id, '2')
+      self.assertEqual(task3.offer_id, '1')
 
     def testDistribution2(self):
       task1 = Task()
@@ -170,8 +172,8 @@ if __name__ == '__main__':
       offers = copy.deepcopy(self.offers)
       task_distributor = TaskDistributor(offers, tasks)
       task_distributor.assign()
-      self.assertEqual(task1.offer_id.value, '1')
-      self.assertEqual(task2.offer_id.value, '3')
-      self.assertEqual(task3.offer_id.value, '2')
+      self.assertEqual(task1.offer_id, '1')
+      self.assertEqual(task2.offer_id, '3')
+      self.assertEqual(task3.offer_id, '2')
 
   unittest.main()
