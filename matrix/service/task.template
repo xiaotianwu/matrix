@@ -1,0 +1,17 @@
+[walle_monitor]
+task_name=WalleMonitor
+docker_image=cpdc/walle_monitor
+command="/walle_monitor_0_2_1/monitor/main.py --kafka_hosts=223.203.199.153:9092,223.203.199.152:9092,223.203.199.150:9092,223.203.199.149:9092,223.203.199.148:9092 --topic=final-log --ip_mapping_file=/walle_monitor_0_2_1/monitor/ipmapping.conf"
+cpus=1
+mem=2048
+
+[kafka]
+task_name=Kafka
+docker_image=cpdc/kafka_mesos
+
+[storm_nimbus]
+task_name=StormNimbus
+docker_image=cpdc/storm_nimbus
+command="su storm&&nohup /usr/lib/apache-storm-0.9.3/bin/storm nimbus"
+cpus=2
+mem=4096

@@ -1,7 +1,0 @@
-[kafka]
-docker_image=cpdc/kafka_mesos
-entry_script=/create_config_and_launch.sh
-required_cpu=1
-required_mem=1024
-net=host
-privileged=true
