@@ -13,26 +13,25 @@ from matrix.core.logger import logger
 from matrix.core.task_pickler import TaskPickler
 
 class MatrixFramework:
-  def __init__(self, framework_name, framework_id, task_pickler = None):
-    self.task_pickler = TaskPickler(framework_name, framework_id, task_pickler)
+  def __init__(self, mesos_host, framework_name, framework_id, zk_client = None):
     self.framework = mesos_pb2.FrameworkInfo()
     self.framework.user = ""
     self.framework.id.value = ""
     self.framework.failover_timeout = 0
-    self.framework.name = "Matrix"
-    self.scheduler = MatrixScheduler(self.task_pickler)
-    host = config.get("mesos", "host")
-    if len(host) == 0:
+    self.framework.name = framework_name
+    self.mesos_host = mesos_host
+    self.zk_client = zk_client
+    if len(mesos_host) == 0:
       raise Exception("host not filled")
-    logger.info("install framework at mesos host: %s" % host)
+
+  def start(self):
+    self.task_pickler = TaskPickler(self.framework.name, "1", self.zk_client)
+    self.scheduler = MatrixScheduler(self.task_pickler)
+    logger.info("start framework")
     self.driver = mesos.native.MesosSchedulerDriver(
       self.scheduler,
       self.framework,
-      host)
-    logger.info("install framework ok")
-
-  def start(self):
-    logger.info("start framework")
+      self.mesos_host)
     self.driver.start()
 
   def stop(self):
@@ -57,7 +56,7 @@ if __name__ == '__main__':
 
   zk_client = KazooClient(hosts = "223.202.46.153:2181")
   zk_client.start()
-  framework = MatrixFramework("MatrixTest", "1", zk_client)
+  framework = MatrixFramework("223.202.46.132:5050", "MatrixTest", "1", zk_client)
   framework.start()
   time.sleep(2)
   task = Task()

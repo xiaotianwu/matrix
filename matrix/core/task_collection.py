@@ -1,5 +1,6 @@
 __author__ = 'xiaotian.wu@chinacache.com'
 
+import logging
 from collections import deque
 
 from matrix.core.logger import logger
@@ -17,34 +18,33 @@ class TaskCollection:
     self.task_set = {}
     self.task_pickler = task_pickler
     self.next_task_id = 0
+    self.init_from_zookeeper()
 
   def init_from_zookeeper(self):
-    if self.task_pickler is None:
-      raise Exception("zookeeper instance not exists")
+    if self.task_pickler is not None:
+      logger.info("init task info from zookeeper") 
+      all_task_data = self.task_pickler.get_all_task()
+      all_task = [deserialize_task(str(data)) for data in all_task_data]
+      max_task_id = -1
 
-    logger.info("init task info from zookeeper") 
-    all_task_data = self.task_pickler.get_all_task()
-    all_task = [deserialize_task(str(data)) for data in all_task_data]
-    max_task_id = -1
-
-    for task in all_task:
-      self.task_set[task.id] = task
-      if task.id > max_task_id:
-        max_task_id = task.id
-      if task.state == TaskState.Pending:
-        self.pending_list.append(task.id)
-      elif task.state == TaskState.Scheduled:
-        self.scheduled_list.add(task.id)
-      elif task.state == TaskState.Running:
-        self.running_list.add(task.id)
-      elif task.state == TaskState.Error:
-        self.error_list.add(task.id)
-      elif task.state == TaskState.Finish:
-        self.finish_list.add(task.id)
-      else:
-        logger.error("task id: %s, unknown task state: %s" % (task.id, task.state))
-    self.next_task_id = max_task_id + 1
-    logger.info("init task info from zookeeper success")
+      for task in all_task:
+        self.task_set[task.id] = task
+        if task.id > max_task_id:
+          max_task_id = task.id
+        if task.state == TaskState.Pending:
+          self.pending_list.append(task.id)
+        elif task.state == TaskState.Scheduled:
+          self.scheduled_list.add(task.id)
+        elif task.state == TaskState.Running:
+          self.running_list.add(task.id)
+        elif task.state == TaskState.Error:
+          self.error_list.add(task.id)
+        elif task.state == TaskState.Finish:
+          self.finish_list.add(task.id)
+        else:
+          logger.error("task id: %s, unknown task state: %s" % (task.id, task.state))
+      self.next_task_id = max_task_id + 1
+      logger.info("init task info from zookeeper success")
 
     if logger.isEnabledFor(logging.DEBUG):
       logger.debug("----------------pending list-----------------")

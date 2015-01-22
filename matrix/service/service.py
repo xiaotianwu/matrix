@@ -12,10 +12,13 @@ from matrix.core.framework import MatrixFramework
 from matrix.core.logger import logger
 from matrix.core.task import Task, TaskProperty
 
+ip = socket.gethostbyname(socket.gethostname())
+port = 30000
 zk_client = KazooClient(hosts = "223.202.46.153:2181")
 zk_client.start()
-framework = MatrixFramework("MatrixTest", "1", zk_client)
-framework.start()
+framework_name = "MatrixTest"
+framework_id = "1"
+framework = MatrixFramework("223.202.46.132:5050", framework_name, framework_id, zk_client)
 
 def hello():
   return "hello"
@@ -46,9 +49,7 @@ def get(task_id):
 def list_all():
   return True
 
-if __name__ == '__main__':
-  ip = socket.gethostbyname(socket.gethostname())
-  port = 30000
+def start_xml_service():
   logger.info('start matrix web service at host %s:%s' %(ip, port))
 
   server = SimpleXMLRPCServer((ip, port))
@@ -59,3 +60,12 @@ if __name__ == '__main__':
   server.register_function(get)
   server.register_function(list_all)
   server.serve_forever()
+
+def leader():
+  logger.info("start leader mode")
+  framework.start()
+  start_xml_service()
+
+if __name__ == '__main__':
+  election = zk_client.Election(framework_name + "/" + framework_id, ip)
+  election.run(leader)
