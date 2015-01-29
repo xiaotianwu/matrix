@@ -16,7 +16,7 @@ ip = socket.gethostbyname(socket.gethostname())
 port = 30000
 zk_client = KazooClient(hosts = "223.202.46.153:2181")
 zk_client.start()
-framework_name = "MatrixTest"
+framework_name = "Matrix"
 framework_id = "1"
 framework = MatrixFramework("223.202.46.132:5050", framework_name, framework_id, zk_client)
 
@@ -25,7 +25,7 @@ def hello():
 
 def add(task_name, docker_image, command, cpus, mem, host):
   task = Task()
-  task.property.append(TaskProperty.AutoRecover)
+  #task.property.append(TaskProperty.AutoRecover)
   if len(task_name) == 0:
     return False
   if cpus <= 0 or mem <= 0:
@@ -67,5 +67,6 @@ def leader():
   start_xml_service()
 
 if __name__ == '__main__':
+  logger.info("start election")
   election = zk_client.Election(framework_name + "/" + framework_id, ip)
   election.run(leader)
