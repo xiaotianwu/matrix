@@ -5,7 +5,7 @@ from mesos.interface import mesos_pb2
 import mesos.native
 
 from matrix.core.task import *
-from matrix.core.task_manager import TaskManager
+from matrix.core.manager import TaskManager
 from matrix.core.logger import logger
 
 class MatrixScheduler(mesos.interface.Scheduler):

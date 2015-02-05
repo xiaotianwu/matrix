@@ -10,7 +10,7 @@ from matrix.core.scheduler import MatrixScheduler
 from matrix.core.task import *
 from matrix.core.config import config
 from matrix.core.logger import logger
-from matrix.core.task_pickler import TaskPickler
+from matrix.core.pickler import TaskPickler
 
 class MatrixFramework:
   def __init__(self, mesos_host, framework_name, framework_id, zk_client = None):

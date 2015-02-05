@@ -151,7 +151,7 @@ class TaskCollection:
 if __name__ == '__main__':
   import logging
   import unittest
-  from matrix.core.task_pickler import TaskPickler
+  from matrix.core.pickler import TaskPickler
   from kazoo.client import KazooClient
 
   class TaskCollectionTest(unittest.TestCase):

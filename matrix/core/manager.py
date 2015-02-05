@@ -3,7 +3,7 @@ __author__ = 'xiaotian.wu@chinacache.com'
 from matrix.core.logger import logger
 from matrix.core.task import *
 from matrix.core.task_collection import TaskCollection
-from matrix.core.task_distributor import TaskDistributor
+from matrix.core.distributor import TaskDistributor
 
 class TaskManager:
   def __init__(self, task_pickler = None):
