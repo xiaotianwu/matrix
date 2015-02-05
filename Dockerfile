@@ -31,3 +31,4 @@ ENV PYTHONPATH /matrix
 
 # for dev
 RUN yum install -y vim
+RUN yum install -y git
