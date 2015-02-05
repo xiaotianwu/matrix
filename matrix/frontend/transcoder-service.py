@@ -9,54 +9,11 @@ from flask import Flask
 from flask import request
 from xml.etree import ElementTree
 
-from kazoo.client import KazooClient
-from matrix.core.config import config
-from matrix.core.framework import MatrixFramework
-from matrix.core.logger import logger
-from matrix.core.task import Task, TaskProperty
-
 app = Flask(__name__)
 ip = socket.gethostbyname(socket.gethostname())
 port = 30000
-zk_client = KazooClient(hosts = "223.202.46.153:2181")
-zk_client.start()
-framework_name = "Matrix"
-framework_id = "1"
-framework = MatrixFramework("223.202.46.132:5050", framework_name, framework_id, zk_client)
 task_map = {}
 task_map_lock = threading.Lock()
-
-def add(task_name, docker_image, command, cpus, mem, host):
-  task = Task()
-  if len(task_name) == 0:
-    return False
-  if cpus <= 0 or mem <= 0:
-    return False
-  task.docker_image = docker_image
-  task.command = command
-  task.name = task_name
-  task.constraint.cpus = cpus
-  task.constraint.mem = mem
-  task.constraint.host = host
-  return framework.add(task)
-
-def delete(task_id):
-  framework.delete(task_id)
-  return True
-
-def get(task_id):
-  return framework.get(task_id)
-
-def list_all():
-  return True
-
-def start_xml_service():
-  logger.info('start matrix web service at host %s:%s' %(ip, port))
-
-def leader():
-  logger.info("start leader mode")
-  framework.start()
-  app.run(host = ip, port = 6000)
 
 @app.route('/')
 def hello_world():
