@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 __author__ = 'xiaotian.wu@chinacache.com'
 
 import socket
