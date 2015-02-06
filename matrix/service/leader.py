@@ -54,17 +54,17 @@ class Create(Resource):
        args['image'] is None or\
        args['command'] is None or\
        args['cpus'] is None or\
-       args['mem'] is None or\
-       args['host'] is None:
+       args['mem'] is None:
       return "some requirement field not filled", 400
     else:
-      add(framework,
-          args['name'],
-          args['image'],
-          args['command'],
-          args['cpus'],
-          args['mem'],
-          args['host'])
+      print args
+      #add(framework,
+      #    args['name'],
+      #    args['image'],
+      #    args['command'],
+      #    args['cpus'],
+      #    args['mem'],
+      #    args['host'])
       return "task created", 200
 
 api.add_resource(Create, '/matrix/create')
