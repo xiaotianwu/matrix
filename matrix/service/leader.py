@@ -24,15 +24,15 @@ framework_name = flags.framework_name
 framework_id = flags.framework_id
 framework = MatrixFramework(flags.mesos, framework_name, framework_id, zk_client)
 
-@app.route('/add')
+@app.route('/add', methods = ['POST'])
 def add_task():
   return add()
 
-@app.route('/delete')
+@app.route('/delete', methods = ['POST'])
 def delete_task():
   return delete()
 
-@app.route('/get')
+@app.route('/get', methods = ['POST'])
 def get_task():
   return get()
 
