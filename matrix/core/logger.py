@@ -4,7 +4,7 @@ import logging
 import logging.config
 import os
 
-logging_conf = "/coding/matrix/matrix/core/logging.conf"
+logging_conf = "/matrix/matrix/core/logging.conf"
 
 if not os.path.exists(logging_conf):
     raise Exception("logging.conf doesn't exist")

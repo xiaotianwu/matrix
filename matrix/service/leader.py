@@ -1,5 +1,7 @@
 __author__ = 'xiaotian.wu@chinacache.com'
 
+import socket
+
 from flask import Flask
 from flask import request
 from kazoo.client import KazooClient
@@ -8,17 +10,19 @@ from matrix.core.config import config
 from matrix.core.framework import MatrixFramework
 from matrix.core.logger import logger
 from matrix.service.api import add, delete, get
+from matrix.service.flags import parse_flag
 
-app = Flask(__name__)
+flags = parse_flag()
 ip = socket.gethostbyname(socket.gethostname())
-port = 30000
+app = Flask(__name__)
+port = flags.rest_port
 
-zk_client = KazooClient(hosts = "223.202.46.153:2181")
+zk_client = KazooClient(hosts = flags.zk)
 zk_client.start()
 
-framework_name = "Matrix"
-framework_id = "1"
-framework = MatrixFramework("223.202.46.132:5050", framework_name, framework_id, zk_client)
+framework_name = flags.framework_name
+framework_id = flags.framework_id
+framework = MatrixFramework(flags.mesos, framework_name, framework_id, zk_client)
 
 @app.route('/add')
 def add_task():
@@ -37,6 +41,9 @@ def run():
   election.run(i_am_leader)
 
 def i_am_leader():
-  logger.info("i have been elected as leader, start leader mode")
+  logger.info("elected as leader, start leader mode")
   framework.start()
-  app.run(host = ip)
+  app.run(host = ip, port = port)
+
+if __name__ == '__main__':
+  run()

@@ -3,7 +3,7 @@ __author__ = 'xiaotian.wu@chinacache.com'
 import os
 import ConfigParser
 
-matrix_conf = "/coding/matrix/matrix/core/matrix.conf"
+matrix_conf = "/matrix/matrix/core/matrix.conf"
 
 if not os.path.exists(matrix_conf):
     raise Exception("matrix.conf doesn't exist")
