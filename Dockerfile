@@ -36,3 +36,7 @@ ENV PYTHONPATH /matrix
 # for dev
 RUN yum install -y vim
 RUN yum install -y git
+
+# a temprory entrypoint
+RUN chmod +x /matrix/matrix/service/leader.py
+ENTRYPOINT ["/matrix/matrix/service/leader.py"]
