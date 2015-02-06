@@ -33,7 +33,6 @@ class MatrixScheduler(mesos.interface.Scheduler):
     else:
       logger.error("Matrix driver not initialized yet")
       return
-    self.task_manager.remove(task_id)
 
   def registered(self, driver, frameworkId, masterInfo):
     logger.info("registered framework id %s" % frameworkId.value)
@@ -108,6 +107,7 @@ class MatrixScheduler(mesos.interface.Scheduler):
 
       if update.state == mesos_pb2.TASK_FINISHED:
         self.task_manager.state_transfer(task.id)
+        self.task_manager.remove(task.id)
         logger.info("task %s finished, message: %s" % (update.task_id.value, update.message))
 
       if update.state == mesos_pb2.TASK_FAILED:
@@ -115,10 +115,13 @@ class MatrixScheduler(mesos.interface.Scheduler):
         self.task_manager.state_transfer(task.id, TaskTransferInput.Error)
         logger.error("task %s failed, error str: %s" % (update.task_id.value, update.message))
 
-      if update.state == mesos_pb2.TASK_KILLED or update.state == mesos_pb2.TASK_LOST:
+      if update.state == mesos_pb2.TASK_KILLED:
         task.clear_offer()
         self.task_manager.state_transfer(task.id, TaskTransferInput.Error)
         logger.error("task %s killed, state: %s" % (update.task_id.value, update.state))
+
+      if update.state == mesos_pb2.TASK_LOST:
+        self.task_manager.remove(task.id)
     else:
       logger.error("task id: %s does not exist" % update.task_id.value)
 
