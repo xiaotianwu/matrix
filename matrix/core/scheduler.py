@@ -26,7 +26,10 @@ class MatrixScheduler(mesos.interface.Scheduler):
 
   def delete(self, task_id):
     if self.driver is not None:
-      self.driver.killTask(task_id)
+      tid = mesos_pb2.TaskID()
+      tid.value = str(task_id)
+      logger.error("Matrix driver kill task: %s" % task_id)
+      self.driver.killTask(tid)
     else:
       logger.error("Matrix driver not initialized yet")
       return
@@ -46,17 +49,16 @@ class MatrixScheduler(mesos.interface.Scheduler):
       task_info.task_id.value = str(task.id)
       task_info.slave_id.value = task.slave_id
       task_info.name = task.name
-      task_info.data = task.command
+      task_info.data = str(task.command)
 
       docker_info = mesos_pb2.ContainerInfo.DockerInfo()
       docker_info.image = task.docker_image
-      docker_info.privileged = True
       docker_info.network = mesos_pb2.ContainerInfo.DockerInfo.HOST
       container_info = mesos_pb2.ContainerInfo()
       container_info.docker.CopyFrom(docker_info)
       container_info.type = mesos_pb2.ContainerInfo.DOCKER
       executor_info = mesos_pb2.ExecutorInfo()
-      executor_info.executor_id.value = "MatrixExecutor"
+      executor_info.executor_id.value = ""
       executor_info.command.value = ""
       executor_info.command.shell = False
       executor_info.name = executor_info.executor_id.value

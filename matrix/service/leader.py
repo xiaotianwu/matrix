@@ -57,21 +57,20 @@ class Create(Resource):
        args['mem'] is None:
       return "some requirement field not filled", 400
     else:
-      print args
-      #add(framework,
-      #    args['name'],
-      #    args['image'],
-      #    args['command'],
-      #    args['cpus'],
-      #    args['mem'],
-      #    args['host'])
+      add(framework,
+          args['name'],
+          args['image'],
+          args['command'],
+          args['cpus'],
+          args['mem'],
+          args['host'])
       return "task created", 200
 
 api.add_resource(Create, '/matrix/create')
 
 class Delete(Resource):
   def post(self, task_id):
-    delete(framework, task_id)
+    delete(framework, int(task_id))
     return "task deleted", 200
 
 api.add_resource(Delete, '/matrix/delete/<task_id>')
