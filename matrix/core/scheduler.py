@@ -19,7 +19,7 @@ class MatrixScheduler(mesos.interface.Scheduler):
     return self.task_manager.add(task)
 
   def get(self, task_id):
-    return self.task_manager.get_task(task_id)
+    return self.task_manager.get(task_id)
 
   def list(self):
     raise Exception("not implemented yet")
@@ -96,7 +96,7 @@ class MatrixScheduler(mesos.interface.Scheduler):
 
   def statusUpdate(self, driver, update):
     logger.info('update task id: %s' % update.task_id.value)
-    task = self.task_manager.get_task(int(update.task_id.value))
+    task = self.task_manager.get(int(update.task_id.value))
     if task is not None:
       slave_id, executor_id = task.slave_id, task.executor_id
       logger.info('slave id: %s, executor id: %s' % (task.slave_id, task.executor_id))

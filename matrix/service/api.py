@@ -19,8 +19,7 @@ def add(framework, task_name,
   task.constraint.cpus = cpus
   task.constraint.mem = mem
   task.constraint.host = host
-  framework.add(task)
-  return True
+  return framework.add(task)
 
 def delete(framework, task_id):
   framework.delete(task_id)

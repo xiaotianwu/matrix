@@ -50,9 +50,9 @@ class Task:
     self.executor_id = executor_id
 
   def __str__(self):
-    return "id: %s, name: %s, docker image: %s, constraint: {%s}" \
+    return "id: %s, name: %s, docker image: %s, constraint: {%s}, " \
            % (self.id, self.name, self.docker_image, str(self.constraint)) + \
-           " priority: %s, property: %s, state: %s, command: %s:" \
+           " priority: %s, property: %s, state: %s, command: %s, " \
            % (self.priority, self.property, self.state, self.command) + \
            " offer id: %s, slave id: %s, executor id: %s" \
            % (self.offer_id, self.slave_id, self.executor_id)

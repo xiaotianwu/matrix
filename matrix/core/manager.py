@@ -21,6 +21,13 @@ class TaskManager:
   def remove(self, task_id):
     self.task_collection.remove(task_id)
 
+  def get(self, task_id):
+    if task_id in self.task_collection.task_set:
+      return self.task_collection.task_set[task_id]
+    else:
+      logger.error("can not get information of task id %s" % task_id)
+      return None
+
   def state_transfer(self, task_id, input_action = None):
     self.task_collection.state_transfer(task_id)
 
@@ -57,13 +64,6 @@ class TaskManager:
     logger.debug('scheduled tasks: %s' % scheduled_tasks)
 
     return scheduled_tasks
-
-  def get_task(self, task_id):
-    if task_id in self.task_collection.task_set:
-      return self.task_collection.task_set[task_id]
-    else:
-      logger.error("can not get information for task id %s" % task_id)
-      return None
 
 if __name__ == '__main__':
   import unittest
