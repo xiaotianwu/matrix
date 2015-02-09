@@ -38,5 +38,5 @@ ADD . /matrix
 ENV PYTHONPATH /matrix
 
 # a temprory entrypoint
-RUN chmod +x /matrix/matrix/service/leader.py
-ENTRYPOINT ["/matrix/matrix/service/leader.py"]
+RUN chmod +x /matrix/matrix/service/start.py
+ENTRYPOINT ["/matrix/matrix/service/start.py"]
