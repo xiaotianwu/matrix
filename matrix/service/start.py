@@ -8,7 +8,6 @@ from flask import Flask
 from flask.ext.restful import reqparse, abort, Api, Resource
 from kazoo.client import KazooClient
 
-from matrix.core.config import config
 from matrix.core.framework import MatrixFramework
 from matrix.core.logger import logger
 from matrix.service.api import add, delete, get, health
