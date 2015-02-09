@@ -14,9 +14,11 @@ from matrix.service.api import add, remove, get, health
 from matrix.service.flags import parse_flag
 
 flags = parse_flag()
+
 ip = socket.gethostbyname(socket.gethostname())
 app = Flask(__name__)
 api = Api(app)
+
 parser = reqparse.RequestParser()
 parser.add_argument('name', type = str)
 parser.add_argument('image', type = str)
