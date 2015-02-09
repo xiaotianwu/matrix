@@ -29,13 +29,13 @@ RUN easy_install flask
 RUN easy_install pip
 RUN pip install flask-restful
 
-# matrix itself
-ADD . /matrix
-ENV PYTHONPATH /matrix
-
 # for dev
 RUN yum install -y vim
 RUN yum install -y git
+
+# matrix itself
+ADD . /matrix
+ENV PYTHONPATH /matrix
 
 # a temprory entrypoint
 RUN chmod +x /matrix/matrix/service/leader.py
