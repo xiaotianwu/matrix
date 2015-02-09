@@ -8,7 +8,6 @@ from mesos.interface import mesos_pb2
 
 from matrix.core.scheduler import MatrixScheduler
 from matrix.core.task import *
-from matrix.core.config import config
 from matrix.core.logger import logger
 from matrix.core.pickler import TaskPickler
 
