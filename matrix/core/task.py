@@ -34,6 +34,8 @@ class Task:
                property = [],
                state = TaskState.Pending,
                command = "",
+               ro_volumes = {},
+               rw_volumes = {},
                offer_id = -1,
                slave_id = -1,
                executor_id = -1):
@@ -45,6 +47,8 @@ class Task:
     self.property = property
     self.state = state
     self.command = command
+    self.ro_volumes = ro_volumes
+    self.rw_volumes = rw_volumes
     self.offer_id = offer_id
     self.slave_id = slave_id
     self.executor_id = executor_id
@@ -54,6 +58,8 @@ class Task:
            % (self.id, self.name, self.docker_image, str(self.constraint)) + \
            " priority: %s, property: %s, state: %s, command: %s, " \
            % (self.priority, self.property, self.state, self.command) + \
+           " read-only volumes: %s, read-write volumes: %s, " \
+           % (self.ro_volumes, self.rw_volumes) + \
            " offer id: %s, slave id: %s, executor id: %s" \
            % (self.offer_id, self.slave_id, self.executor_id)
 
@@ -83,6 +89,7 @@ if __name__ == '__main__':
       t1 = Task()
       t1.constraint.cpus = 2
       t1.constraint.mem = 3
+      t1.ro_volumes = {'/a':'/b'}
       t2 = serialize_task(t1)
       print t2
       t3 = deserialize_task(t2)

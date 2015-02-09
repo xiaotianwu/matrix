@@ -21,6 +21,8 @@ parser = reqparse.RequestParser()
 parser.add_argument('name', type = str)
 parser.add_argument('image', type = str)
 parser.add_argument('command', type = str)
+parser.add_argument('ro_volumes', type = str)
+parser.add_argument('rw_volumes', type = str)
 parser.add_argument('cpus', type = int)
 parser.add_argument('mem', type = int)
 parser.add_argument('host', type = str)
@@ -61,6 +63,8 @@ class Add(Resource):
                     args['name'],
                     args['image'],
                     args['command'],
+                    args['ro_volumes'],
+                    args['rw_volumes'],
                     args['cpus'],
                     args['mem'],
                     args['host'])

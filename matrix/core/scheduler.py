@@ -52,6 +52,7 @@ class MatrixScheduler(mesos.interface.Scheduler):
       container_info = mesos_pb2.ContainerInfo()
       container_info.docker.CopyFrom(docker_info)
       container_info.type = mesos_pb2.ContainerInfo.DOCKER
+
       # for container data collection usage
       sys_volume = container_info.volumes.add()
       sys_volume.host_path = "/sys"
@@ -61,6 +62,18 @@ class MatrixScheduler(mesos.interface.Scheduler):
       var_lib_docker_volume.host_path = "/var/lib/docker"
       var_lib_docker_volume.container_path = "/var/lib/docker"
       var_lib_docker_volume.mode = mesos_pb2.Volume.RO
+
+      for (host_path, container_path) in task.ro_volumes.items():
+        ro_volume = container_info.volumes.add()
+        ro_volume.host_path = host_path
+        ro_volume.container_path = container_path
+        ro_volume.mode = mesos_pb2.Volume.RO     
+
+      for (host_path, container_path) in task.rw_volumes.items():
+        rw_volume = container_info.volumes.add()
+        rw_volume.host_path = host_path
+        rw_volume.container_path = container_path
+        rw_volume.mode = mesos_pb2.Volume.RW
 
       executor_info = mesos_pb2.ExecutorInfo()
       executor_info.executor_id.value = ""
