@@ -38,12 +38,7 @@ class MatrixScheduler(mesos.interface.Scheduler):
     logger.info("registered framework id %s" % frameworkId.value)
     self.driver = driver
 
-  def resourceOffers(self, driver, offers):
-    logger.debug('rescource offers from %s' % [offer.hostname for offer in offers])
-    scheduled_tasks = self.task_manager.schedule(offers)
-
-    accept_offer_ids = []
-    for task in scheduled_tasks:
+  def create_task_info(self, task):
       task_info = mesos_pb2.TaskInfo()
       task_info.task_id.value = str(task.id)
       task_info.slave_id.value = task.slave_id
@@ -53,9 +48,20 @@ class MatrixScheduler(mesos.interface.Scheduler):
       docker_info = mesos_pb2.ContainerInfo.DockerInfo()
       docker_info.image = task.docker_image
       docker_info.network = mesos_pb2.ContainerInfo.DockerInfo.HOST
+
       container_info = mesos_pb2.ContainerInfo()
       container_info.docker.CopyFrom(docker_info)
       container_info.type = mesos_pb2.ContainerInfo.DOCKER
+      # for container data collection usage
+      sys_volume = container_info.volumes.add()
+      sys_volume.host_path = "/sys"
+      sys_volume.container_path = "/sys"
+      sys_volume.mode = mesos_pb2.Volume.RO
+      var_lib_docker_volume = container_info.volumes.add()
+      var_lib_docker_volume.host_path = "/var/lib/docker"
+      var_lib_docker_volume.container_path = "/var/lib/docker"
+      var_lib_docker_volume.mode = mesos_pb2.Volume.RO
+
       executor_info = mesos_pb2.ExecutorInfo()
       executor_info.executor_id.value = ""
       executor_info.command.value = ""
@@ -81,11 +87,21 @@ class MatrixScheduler(mesos.interface.Scheduler):
       mem.type = mesos_pb2.Value.SCALAR
       mem.scalar.value = task.constraint.mem
 
-      tasks_info = []
-      tasks_info.append(task_info)
+      return task_info
+
+
+  def resourceOffers(self, driver, offers):
+    logger.debug('rescource offers from %s' % [offer.hostname for offer in offers])
+    scheduled_tasks = self.task_manager.schedule(offers)
+
+    accept_offer_ids = []
+    for task in scheduled_tasks:
+      task_info = self.create_task_info(task)
+      task_info_list = []
+      task_info_list.append(task_info)
       offer_id = mesos_pb2.OfferID()
       offer_id.value = task.offer_id
-      driver.launchTasks(offer_id, tasks_info)
+      driver.launchTasks(offer_id, task_info_list)
       self.task_manager.task_collection.dfa(task.id)
       accept_offer_ids.append(offer_id)
       self.task_number += 1
