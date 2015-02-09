@@ -10,7 +10,7 @@ from kazoo.client import KazooClient
 
 from matrix.core.framework import MatrixFramework
 from matrix.core.logger import logger
-from matrix.service.api import add, delete, get, health
+from matrix.service.api import add, remove, get, health
 from matrix.service.flags import parse_flag
 
 flags = parse_flag()
@@ -47,7 +47,7 @@ class Get(Resource):
 
 api.add_resource(Get, '/matrix/get/<task_id>')
 
-class Create(Resource):
+class Add(Resource):
   def post(self):
     args = parser.parse_args()
     if args['name'] is None or\
@@ -66,14 +66,14 @@ class Create(Resource):
                     args['host'])
       return str(task_id), 200
 
-api.add_resource(Create, '/matrix/create')
+api.add_resource(Add, '/matrix/add')
 
-class Delete(Resource):
+class Remove(Resource):
   def post(self, task_id):
-    delete(framework, int(task_id))
+    remove(framework, int(task_id))
     return "1", 200
 
-api.add_resource(Delete, '/matrix/delete/<task_id>')
+api.add_resource(Remove, '/matrix/remove/<task_id>')
 
 def i_am_leader():
   logger.info("elected as leader, start leader mode")

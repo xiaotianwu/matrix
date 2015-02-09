@@ -21,8 +21,8 @@ def add(framework, task_name,
   task.constraint.host = host
   return framework.add(task)
 
-def delete(framework, task_id):
-  framework.delete(task_id)
+def remove(framework, task_id):
+  framework.remove(task_id)
   return True
 
 def get(framework, task_id):

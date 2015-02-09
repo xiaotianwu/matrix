@@ -67,14 +67,14 @@ if __name__ == '__main__':
 
   class TaskPicklerTest(unittest.TestCase):
     def setUp(self):
-      self.zk_client = KazooClient(hosts = "223.202.46.153:2181")
+      self.zk_client = KazooClient(hosts = "223.202.46.152:2181")
       self.zk_client.start()
 
     def tearDown(self):
       self.zk_client.stop()
 
     def testBasicUsage(self):
-      pickler = TaskPickler("MatrixTest", "1", self.zk_client)
+      pickler = TaskPickler("Matrix", "1", self.zk_client)
       pickler.update_task_node(1, "hello")
       pickler.update_task_node(2, "thankyou")
       self.assertEqual("hello", pickler.get_task(1))

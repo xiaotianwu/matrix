@@ -18,33 +18,33 @@ class TaskCollection:
     self.task_set = {}
     self.task_pickler = task_pickler
     self.next_task_id = 0
-    self.init_from_zookeeper()
+    if self.task_pickler is not None:
+      self.init_from_zookeeper()
 
   def init_from_zookeeper(self):
-    if self.task_pickler is not None:
-      logger.info("init task info from zookeeper") 
-      all_task_data = self.task_pickler.get_all_task()
-      all_task = [deserialize_task(str(data)) for data in all_task_data]
-      max_task_id = -1
+    logger.info("init task collection info from zookeeper") 
+    all_task_data = self.task_pickler.get_all_task()
+    all_task = [deserialize_task(str(data)) for data in all_task_data]
+    max_task_id = -1
 
-      for task in all_task:
-        self.task_set[task.id] = task
-        if task.id > max_task_id:
-          max_task_id = task.id
-        if task.state == TaskState.Pending:
-          self.pending_list.append(task.id)
-        elif task.state == TaskState.Scheduled:
-          self.scheduled_list.add(task.id)
-        elif task.state == TaskState.Running:
-          self.running_list.add(task.id)
-        elif task.state == TaskState.Error:
-          self.error_list.add(task.id)
-        elif task.state == TaskState.Finish:
-          self.finish_list.add(task.id)
-        else:
-          logger.error("task id: %s, unknown task state: %s" % (task.id, task.state))
-      self.next_task_id = max_task_id + 1
-      logger.info("init task info from zookeeper success")
+    for task in all_task:
+      self.task_set[task.id] = task
+      if task.id > max_task_id:
+        max_task_id = task.id
+      if task.state == TaskState.Pending:
+        self.pending_list.append(task.id)
+      elif task.state == TaskState.Scheduled:
+        self.scheduled_list.add(task.id)
+      elif task.state == TaskState.Running:
+        self.running_list.add(task.id)
+      elif task.state == TaskState.Error:
+        self.error_list.add(task.id)
+      elif task.state == TaskState.Finish:
+        self.finish_list.add(task.id)
+      else:
+        logger.error("task id: %s, unknown task state: %s" % (task.id, task.state))
+    self.next_task_id = max_task_id + 1
+    logger.info("init task collection info from zookeeper success")
 
     if logger.isEnabledFor(logging.DEBUG):
       logger.debug("----------------pending list-----------------")
@@ -81,7 +81,7 @@ class TaskCollection:
 
   def remove(self, task_id):
     if task_id not in self.task_set:
-      logger.error("can not remove non-exist task id: %s" % task_id)
+      logger.error("can not remove non-exist task,  id: %s" % task_id)
       return
 
     state = self.task_set[task_id].state
@@ -107,7 +107,7 @@ class TaskCollection:
 
     logger.info('remove task: %s' % task_info)
 
-  def state_transfer(self, task_id, input_action = None):
+  def dfa(self, task_id, input_action = None):
     if task_id not in self.task_set:
       logger.error("non-exist task id: %s" % task_id)
       return
@@ -158,7 +158,7 @@ if __name__ == '__main__':
     def setUp(self):
       self.zk_client = KazooClient(hosts = "223.202.46.153:2181")
       self.zk_client.start()
-      self.pickler = TaskPickler("MatrixTest", "1", self.zk_client)
+      self.pickler = TaskPickler("Matrix", "1", self.zk_client)
       logger.setLevel(logging.DEBUG)
 
     def tearDown(self):
@@ -172,11 +172,11 @@ if __name__ == '__main__':
       task_collection = TaskCollection()
       self.assertEqual(task_collection.add(task), 0)
       self.assertEqual(task.state, TaskState.Pending)
-      task_collection.state_transfer(0)
+      task_collection.dfa(0)
       self.assertEqual(task.state, TaskState.Scheduled)
-      task_collection.state_transfer(0)
+      task_collection.dfa(0)
       self.assertEqual(task.state, TaskState.Running)
-      task_collection.state_transfer(0)
+      task_collection.dfa(0)
       self.assertEqual(task.state, TaskState.Finish)
       task_collection.remove(0)
       task_collection.remove(1)

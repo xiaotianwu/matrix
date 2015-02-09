@@ -46,8 +46,8 @@ class MatrixFramework:
   def list(self, condition):
     raise Exception("not implemented yet")
 
-  def delete(self, task_id):
-    self.scheduler.delete(task_id)
+  def remove(self, task_id):
+    self.scheduler.remove(task_id)
 
 if __name__ == '__main__':
   import time

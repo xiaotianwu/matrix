@@ -24,7 +24,7 @@ class MatrixScheduler(mesos.interface.Scheduler):
   def list(self):
     raise Exception("not implemented yet")
 
-  def delete(self, task_id):
+  def remove(self, task_id):
     if self.driver is not None:
       tid = mesos_pb2.TaskID()
       tid.value = str(task_id)
@@ -86,7 +86,7 @@ class MatrixScheduler(mesos.interface.Scheduler):
       offer_id = mesos_pb2.OfferID()
       offer_id.value = task.offer_id
       driver.launchTasks(offer_id, tasks_info)
-      self.task_manager.state_transfer(task.id)
+      self.task_manager.task_collection.dfa(task.id)
       accept_offer_ids.append(offer_id)
       self.task_number += 1
 
@@ -102,22 +102,22 @@ class MatrixScheduler(mesos.interface.Scheduler):
       logger.info('slave id: %s, executor id: %s' % (task.slave_id, task.executor_id))
 
       if update.state == mesos_pb2.TASK_RUNNING:
-        self.task_manager.state_transfer(task.id)
+        self.task_manager.task_collection.dfa(task.id)
         logger.info("task %s is running" % update.task_id.value)
 
       if update.state == mesos_pb2.TASK_FINISHED:
-        self.task_manager.state_transfer(task.id)
+        self.task_manager.task_collection.dfa(task.id)
         self.task_manager.remove(task.id)
         logger.info("task %s finished, message: %s" % (update.task_id.value, update.message))
 
       if update.state == mesos_pb2.TASK_FAILED:
         task.clear_offer()
-        self.task_manager.state_transfer(task.id, TaskTransferInput.Error)
+        self.task_manager.task_collection.dfa(task.id, TaskTransferInput.Error)
         logger.error("task %s failed, error str: %s" % (update.task_id.value, update.message))
 
       if update.state == mesos_pb2.TASK_KILLED:
         task.clear_offer()
-        self.task_manager.state_transfer(task.id, TaskTransferInput.Error)
+        self.task_manager.task_collection.dfa(task.id, TaskTransferInput.Error)
         logger.error("task %s killed, state: %s" % (update.task_id.value, update.state))
 
       if update.state == mesos_pb2.TASK_LOST:

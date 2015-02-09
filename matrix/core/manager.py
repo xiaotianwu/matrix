@@ -28,9 +28,6 @@ class TaskManager:
       logger.error("can not get information of task id %s" % task_id)
       return None
 
-  def state_transfer(self, task_id, input_action = None):
-    self.task_collection.state_transfer(task_id)
-
   def recover_tasks(self):
     recover_tasks = []
     for task_id in self.task_collection.error_list:
@@ -42,7 +39,7 @@ class TaskManager:
 
     for task_id in recover_tasks:
       logger.info("recover task id: %s" % task_id)
-      self.state_transfer(task_id, TaskTransferInput.Recover)
+      self.task_collection.dfa(task_id, TaskTransferInput.Recover)
 
   def schedule(self, offers):
     self.recover_tasks()
@@ -80,11 +77,11 @@ if __name__ == '__main__':
       task_manager.add(task)
       self.assertEqual(task.state, TaskState.Pending)
       self.assertEqual(task.id, 0)
-      task_manager.state_transfer(0)
+      task_manager.task_collection.dfa(0)
       self.assertEqual(task.state, TaskState.Scheduled)
-      task_manager.state_transfer(0)
+      task_manager.task_collection.dfa(0)
       self.assertEqual(task.state, TaskState.Running)
-      task_manager.state_transfer(0)
+      task_manager.task_collection.dfa(0)
       self.assertEqual(task.state, TaskState.Finish)
       task_manager.remove(0)
 
