@@ -102,22 +102,27 @@ class MatrixScheduler(mesos.interface.Scheduler):
 
       return task_info
 
-
   def resourceOffers(self, driver, offers):
     logger.debug('rescource offers from %s' % [offer.hostname for offer in offers])
     scheduled_tasks = self.task_manager.schedule(offers)
 
     accept_offer_ids = []
+    offer_id_to_tasks = {}
+
+    # merge tasks with same offer id
     for task in scheduled_tasks:
-      task_info = self.create_task_info(task)
-      task_info_list = []
-      task_info_list.append(task_info)
-      offer_id = mesos_pb2.OfferID()
-      offer_id.value = task.offer_id
-      driver.launchTasks(offer_id, task_info_list)
+      if task.offer_id not in offer_id_to_tasks:
+        offer_id_to_tasks[task.offer_id] = []
+      offer_id_to_tasks[task.offer_id].append(self.create_task_info(task))
+      # TODO: change task states until launching
       self.task_manager.task_collection.dfa(task.id)
-      accept_offer_ids.append(offer_id)
       self.task_number += 1
+
+    for (task_offer_id, task_info_list) in offer_id_to_tasks.items():
+      offer_id = mesos_pb2.OfferID()
+      offer_id.value = task_offer_id
+      driver.launchTasks(offer_id, task_info_list)
+      accept_offer_ids.append(offer_id)
 
     for offer in offers:
       if offer.id not in accept_offer_ids:
