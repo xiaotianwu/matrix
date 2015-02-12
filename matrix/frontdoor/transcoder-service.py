@@ -1,17 +1,17 @@
 #!/usr/bin/python
 
-__author__ = 'xiaotian.wu@chinacache.com'
+__author__ = 'yiji.liu@chinacache.com'
 
-import socket
+import subprocess
 import threading
 
 from flask import Flask
 from flask import request
 from xml.etree import ElementTree
 
+from matrix.core.logger import logger
+
 app = Flask(__name__)
-ip = socket.gethostbyname(socket.gethostname())
-port = 30000
 task_map = {}
 task_map_lock = threading.Lock()
 
@@ -30,6 +30,7 @@ def start_transcoder():
     data = request.environ["wsgi.input"].read(request_body_size)
 
   response = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+  print response
   if data and parse_cmd(data, "start"):
     response += "<success></success>"
   else:
@@ -52,7 +53,7 @@ def stop_transcoder():
   else:
     response += "<errors><error>unknown error.</error></errors>"
   return response
-      
+
 def parse_cmd(xmldata, type):
   try:
     logger.info(xmldata)
@@ -108,11 +109,14 @@ def parse_cmd(xmldata, type):
 #acodec: aac
 def start_task(input, out, bitrate, resolution, vcodec, acodec):
   command = '/ffmpeg/ffmpeg -i %s -acodec copy -vcodec copy -f flv %s' % (input, out)
-  logger.info(command)
-  task_id = add(input + ' ' + out, "223.202.46.132:5000/transcoder", command, 1, 1024, None)
-  logger.info("task_id:%s" % task_id)
+  curl_command = "curl http://10.20.72.130:30000/matrix/add -d \"name=%s\" -d \"image=%s\" -d \"command=%s\" -d \"cpus=%s\" -d \"mem=%s\" -X POST" \
+                 % (input + ' ' + out, "180.97.185.35:5000/transcoder", command, 1, 1024)
+  logger.info(curl_command)
+  return_msg = subprocess.Popen(curl_command, stdout = subprocess.PIPE, shell = True)
+  task_id = return_msg.stdout.read()
+  task_id = int(task_id.strip("\""))
+  logger.info(task_id)
   task_map_lock.acquire()
-  logger.info(input)
   if input not in task_map:
     task_map[input] = []
   task_map[input].append(task_id)
@@ -123,11 +127,10 @@ def stop_task(input):
   task_map_lock.acquire()
   if input in task_map:
     for task_id in task_map[input]:
-      delete(task_id)
+      curl_command = "curl http://10.20.72.130:30000/matrix/remove/%s -X POST" % task_id
+      os.system(curl_command)
+  task_map[input] = []
   task_map_lock.release()
   return True
 
-if __name__ == '__main__':
-  logger.info("start election")
-  election = zk_client.Election(framework_name + "/" + framework_id, ip)
-  election.run(leader)
+app.run("0.0.0.0", port = 40000)
