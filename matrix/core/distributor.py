@@ -33,7 +33,7 @@ class TaskDistributor:
       logger.debug('--------------------offers mapping-------------------')
       for i in self.offer_map.iternodes():
         logger.debug(str(i.key) + '\t' + str(i.value))
-      logger.debug('------------offers reverse mapping-------------------')
+      logger.debug('----------------offers reverse mapping---------------')
       for key in self.reverse_offer_map.keys():
         logger.debug(str(key) + '\t' + str(self.reverse_offer_map[key]))
 
@@ -57,16 +57,17 @@ class TaskDistributor:
         iterator = iter(self.offer_map)
         iterator.goto(self.reverse_offer_map[task.constraint.host])
         offer_id, slave_id, cpus, mem, hostname = iterator.get()
-        try:
-          iterator.delete()
-        except StopIteration:
-          pass
         if cpus >= task.constraint.cpus and mem >= task.constraint.mem:
           choose = True
+          try:
+            iterator.delete()
+          except StopIteration:
+            pass
       else:
-        offer_id, slave_id, cpus, mem, hostname = self.offer_map.pop()
+        offer_id, slave_id, cpus, mem, hostname = self.offer_map[self.offer_map.min()]
         if cpus >= task.constraint.cpus and mem >= task.constraint.mem:
           choose = True
+          self.offer_map.pop()
 
       if choose is True:
         task.offer_id = offer_id.value
