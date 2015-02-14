@@ -8,7 +8,7 @@ def _get_resource_from_offer(offer, target):
   for res in offer.resources:
     if res.name == target and res.type == mesos_pb2.Value.SCALAR:
       return res.scalar.value
-  raise Exception("target: %s not exists in offer: %s" % (target, str(offer)))
+  return 0
 
 def get_cpus_from_offer(offer):
   return float(str(_get_resource_from_offer(offer, "cpus")))
