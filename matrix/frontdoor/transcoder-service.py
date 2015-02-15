@@ -2,6 +2,8 @@
 
 __author__ = 'yiji.liu@chinacache.com'
 
+import os
+import socket
 import subprocess
 import threading
 
@@ -11,6 +13,7 @@ from xml.etree import ElementTree
 
 from matrix.core.logger import logger
 
+ip = socket.gethostbyname(socket.gethostname())
 app = Flask(__name__)
 task_map = {}
 task_map_lock = threading.Lock()
@@ -109,8 +112,8 @@ def parse_cmd(xmldata, type):
 #acodec: aac
 def start_task(input, out, bitrate, resolution, vcodec, acodec):
   command = '/ffmpeg/ffmpeg -i %s -acodec copy -vcodec copy -f flv %s' % (input, out)
-  curl_command = "curl http://10.20.72.130:30000/matrix/add -d \"name=%s\" -d \"image=%s\" -d \"command=%s\" -d \"cpus=%s\" -d \"mem=%s\" -X POST" \
-                 % (input + ' ' + out, "180.97.185.35:5000/transcoder", command, 1, 1024)
+  curl_command = "curl http://%s:30000/matrix/add -d \"name=%s\" -d \"image=%s\" -d \"command=%s\" -d \"cpus=%s\" -d \"mem=%s\" -X POST" \
+                 % (ip, input + ' ' + out, "180.97.185.35:5000/transcoder", command, 1, 1024)
   logger.info(curl_command)
   return_msg = subprocess.Popen(curl_command, stdout = subprocess.PIPE, shell = True)
   task_id = return_msg.stdout.read()
@@ -127,7 +130,8 @@ def stop_task(input):
   task_map_lock.acquire()
   if input in task_map:
     for task_id in task_map[input]:
-      curl_command = "curl http://10.20.72.130:30000/matrix/remove/%s -X POST" % task_id
+      curl_command = "curl http://%s:30000/matrix/remove/%s -X POST" % (ip, task_id)
+      logger.info(curl_command)
       os.system(curl_command)
   task_map[input] = []
   task_map_lock.release()
