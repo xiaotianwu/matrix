@@ -4,12 +4,21 @@ import json
 
 from matrix.core.util import Enum, object_to_dict, dict_to_object
 
+# Task Priority is not used now
 TaskPriority = Enum(['Low', 'Median', 'High', 'RealTime'])
 TaskProperty = Enum(['Stateless', 'Exclusive', 'AutoRecover'])
 TaskState = Enum(['Pending', 'Scheduled', 'Running', 'Error', 'Finish'])
 TaskTransferInput = Enum(["Error", "Recover", "Reschedule"])
 
 class TaskConstraint:
+  '''Basic constraint for task. Sometime we need to assign task to
+     the specified host for some reason. For example, a Kafka node
+     running on 192.168.0.1 keeps its data on local storage device
+     and there is no other node has enough space to replicate it, we
+     have to limit it to the node 192.168.0.1. If the field of task
+     constraint has been filled, the task will only be run if and only
+     if the specified host has enough resources(cpu and memory).
+     And, rack constraint is not used now.'''
   def __init__(self,
                cpus = -1,
                mem = -1,
@@ -25,6 +34,11 @@ class TaskConstraint:
            % (self.cpus, self.mem, self.rack, self.host)
 
 class Task:
+  '''The necessary information for task. Explantion for some comfusable
+     field. ro_volumes refers to read-only volumes mapping for Docker
+     containers, and rw_volumes refers to read-write. IP is used to
+     service discovery. If a task run as a web-service, we can use the
+     name/ip pair to locate it'''
   def __init__(self,
                id = -1,
                name = "",
@@ -38,7 +52,8 @@ class Task:
                rw_volumes = {},
                offer_id = -1,
                slave_id = -1,
-               executor_id = -1):
+               executor_id = -1,
+               ip = ""):
     self.id = id
     self.name = name
     self.docker_image = docker_image
@@ -52,6 +67,7 @@ class Task:
     self.offer_id = offer_id
     self.slave_id = slave_id
     self.executor_id = executor_id
+    self.ip = ip
 
   def __str__(self):
     return "id: %s, name: %s, docker image: %s, constraint: {%s}, " \
@@ -60,8 +76,8 @@ class Task:
            % (self.priority, self.property, self.state, self.command) + \
            " read-only volumes: %s, read-write volumes: %s, " \
            % (self.ro_volumes, self.rw_volumes) + \
-           " offer id: %s, slave id: %s, executor id: %s" \
-           % (self.offer_id, self.slave_id, self.executor_id)
+           " offer id: %s, slave id: %s, executor id: %s, ip: %s" \
+           % (self.offer_id, self.slave_id, self.executor_id, self.ip)
 
   def clear_offer(self):
     self.offer_id = -1
