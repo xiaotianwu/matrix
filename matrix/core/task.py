@@ -19,6 +19,7 @@ class TaskConstraint:
      constraint has been filled, the task will only be run if and only
      if the specified host has enough resources(cpu and memory).
      And, rack constraint is not used now.'''
+
   def __init__(self,
                cpus = -1,
                mem = -1,
@@ -39,6 +40,7 @@ class Task:
      containers, and rw_volumes refers to read-write. IP is used to
      service discovery. If a task run as a web-service, we can use the
      name/ip pair to locate it'''
+
   def __init__(self,
                id = -1,
                name = "",

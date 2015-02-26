@@ -3,16 +3,40 @@ __author__ = 'xiaotian.wu@chinacache.com'
 from matrix.core.logger import logger
 
 class TaskPickler:
+  '''TaskPickler is used to store and publish
+     the task information to zookeeper service.
+     It's important that the framework with
+     identified id will use same zk path to persist
+     the task data. A typical zk path structure:
+     /framework_name
+      |
+      --framework_id
+        |
+        --path-for-leader-election
+        |
+        --task_set
+          |
+          --1 (information of task id 1)
+          |
+          --2 (information of task id 2)
+          ...
+          |
+          |
+          --N (information of task id N)'''
+
   def __init__(self, framework_name, framework_id, zk_client):
     if zk_client is None:
-      raise Exception("zk client not exists")
+      raise Exception("zk client does not exist")
     self.zk = zk_client
     self.framework_name = framework_name
     self.framework_id = framework_id
     self.zk_root = '/%s/%s/' % (framework_name, framework_id)
-    self.task_set_root = self.zk_root + 'task_set/' 
-    logger.info("init task pickler, framework name: %s, framework id: %s, zk root: %s, task set root: %s"
-                % (self.framework_name, self.framework_id, self.zk_root, self.task_set_root))
+    self.task_set_root = self.zk_root + 'task_set/'
+
+    logger.info("init task pickler, framework name: %s,"
+                "framework id: %s, zk root: %s, task set root: %s"
+                % (self.framework_name, self.framework_id,
+                   self.zk_root, self.task_set_root))
 
     if not self.zk.exists(self.zk_root):
       self.zk.ensure_path(self.zk_root)
@@ -58,8 +82,11 @@ class TaskPickler:
   def clear_metadata(self):
     if self.zk.exists(self.zk_root):
       self.zk.delete(self.zk_root, recursive = True)
-    logger.warning("clear task pickler, framework name: %s, framework id: %s, zk root: %s, task set root: %s"
-                   % (self.framework_name, self.framework_id, self.zk_root, self.task_set_root))
+    logger.warning("clear task pickler,"
+                   "framework name: %s, framework id: %s,"
+                   "zk root: %s, task set root: %s"
+                   % (self.framework_name, self.framework_id,
+                      self.zk_root, self.task_set_root))
 
 if __name__ == '__main__':
   import unittest

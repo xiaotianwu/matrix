@@ -9,6 +9,26 @@ from matrix.core.task import (TaskState, TaskConstraint,
                               serialize_task, deserialize_task)
  
 class TaskCollection:
+  '''Explanation for kinds of list.
+     PENDING LIST: As you know, pending list refers to the
+     tasks which haven't be scheduled yet.
+     SCHEDULED LIST: If the framework has enough resources
+     to run a task(warning: the task constraint, i.e. host,
+     must be satisfied), and the scheduler choose this task
+     to run, the task status will be *scheduled*. Which means
+     that the task is ready to run. It should be noted that the
+     matrix executor always be run in Docker Container, such
+     that before the executor begins to run the command(maybe
+     it will take a period of time to download the image if
+     the image itself doesn't exist in that host), the task
+     status should be *scheduled* but not *running*.
+     RUNNING LIST: if the executor report that the process
+     has been started, it's in running list.
+     ERROR LIST: the task exited abnormally is in error list.
+     if it has *AutoRecover* property, it will be moved to
+     pending list again to be rescheduled.
+     FINISH LIST: just for statistics. not used now.'''
+
   def __init__(self, task_pickler = None):
     self.pending_list = deque()
     self.scheduled_list = set()
@@ -22,7 +42,10 @@ class TaskCollection:
       self.init_from_zookeeper()
 
   def init_from_zookeeper(self):
-    logger.info("init task collection info from zookeeper") 
+    '''the framework node which has been elected as leader
+       should check zookeeper first, in order to rebuild
+       the pending/scheduled/etc list if necessary'''
+    logger.info("init task info from zookeeper") 
     all_task_data = self.task_pickler.get_all_task()
     all_task = [deserialize_task(str(data)) for data in all_task_data]
     max_task_id = -1
@@ -108,6 +131,26 @@ class TaskCollection:
     logger.info('remove task: %s' % task_info)
 
   def dfa(self, task_id, input_action = None):
+    '''DFA refers to Deterministic Finite Automation. We use
+       dfa to describe the state transfer of the task.
+       PENDING <---------------
+          |                   |
+          |                   |
+          v                   | task with
+      SCHEDULED               | *AutoRecover*
+          |                   | property
+          |                   |
+          |                   |
+          v    error occur    |
+       RUNNING ------------> ERROR
+          |                   |   
+          | shutdown manually | task without
+          |         /         | *AutoRecover*
+          |    program exit   | property
+          v                   |
+       FINISHED <--------------
+    '''
+
     if task_id not in self.task_set:
       logger.error("non-exist task id: %s" % task_id)
       return

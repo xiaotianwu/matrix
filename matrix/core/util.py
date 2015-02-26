@@ -10,6 +10,8 @@ def MD5(s):
   m.update(s)
   return m.hexdigest()
 
+'''the following functions are used to
+   json serialzation/deserialzation'''
 def object_to_dict(obj):
   dictionary = dict()
   dictionary['__class__'] = obj.__class__.__name__
@@ -36,7 +38,7 @@ class Enum(set):
     raise AttributeError
 
 class Locking():
-  '''scope locking'''
+  '''a simple scope locking mechanism'''
   def __init__(self, locker):
     self._locker = locker
 

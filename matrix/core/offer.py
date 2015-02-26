@@ -4,7 +4,7 @@ import mesos.interface
 from mesos.interface import mesos_pb2
 
 def _get_resource_from_offer(offer, target):
-  '''internal used'''
+  '''internal used, load specified value from mesos offer'''
   for res in offer.resources:
     if res.name == target and res.type == mesos_pb2.Value.SCALAR:
       return res.scalar.value
