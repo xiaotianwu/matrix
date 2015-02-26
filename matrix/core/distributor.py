@@ -11,6 +11,22 @@ CPU_FACTOR = 0.6
 MEM_FACTOR = 1 - CPU_FACTOR
 
 class TaskDistributor:
+  '''The strategy of task distributing is similar as
+     earlier version of Linux CPU scheduler.
+     It creates two mappings:
+     1) the resource weight to resource info
+        This is a Red-Black tree, each round we choose
+        the node with minimal value(which refers to the
+        host with maximum cpu/memory resource) to assign
+        the task, and then we modify the weight of that
+        host. Note that the task is in FIFO queue now
+        such that the *priority* field is useless.
+        TODO: active the *priority*
+     2) the resource name to the resource weight
+        It seems to be a reverse mapping of 1) but it only
+        uses the host name to be the keys. This mapping
+        is used to satisfy the requirement of host-specified task.'''
+
   def __init__(self, offers, tasks):
     self.offers = offers
     self.tasks = tasks
@@ -37,7 +53,9 @@ class TaskDistributor:
       for key in self.reverse_offer_map.keys():
         logger.debug(str(key) + '\t' + str(self.reverse_offer_map[key]))
 
-  def calculate_weight(self, cpus, mem): 
+  def calculate_weight(self, cpus, mem):
+    '''the smaller weight means more resources. Since it's
+       the minus value of cpu/memory allocation'''
     weight = -(cpus * CPU_FACTOR + mem / 1024 * MEM_FACTOR)
     # avoid same value appeared in rb tree, the ealier offer will have smaller weight
     while self.offer_map.has_key(weight):

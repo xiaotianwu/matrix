@@ -82,12 +82,6 @@ class MatrixScheduler(mesos.interface.Scheduler):
       executor_info.name = executor_info.executor_id.value
       executor_info.container.CopyFrom(container_info)
 
-      #executor_info = mesos_pb2.ExecutorInfo()
-      #executor_info.executor_id.value = "mesos-executor"
-      #executor_info.command.value = "/root/cpdc/mesos_container/mesos_docker_executor/executor.py"
-      #executor_info.name = "MesosExecutor"
-      #executor_info.source = "MesosPlatform"
-     
       task_info.executor.CopyFrom(executor_info)
 
       cpus = task_info.resources.add()
@@ -114,7 +108,6 @@ class MatrixScheduler(mesos.interface.Scheduler):
       if task.offer_id not in offer_id_to_tasks:
         offer_id_to_tasks[task.offer_id] = []
       offer_id_to_tasks[task.offer_id].append(self.create_task_info(task))
-      # TODO: change task states until launching
       self.task_manager.task_collection.dfa(task.id)
       self.task_number += 1
 
