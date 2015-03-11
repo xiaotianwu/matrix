@@ -11,7 +11,7 @@ def find_template(vcodec_value, acodec_value, bit_value, res_value):
     str2 = mod_root + 'mod_%s_%s_%s'%(vcodec_value, acodec_value, bit_value)
     str3 = mod_root + 'mod_%s_%s'%(vcodec_value, acodec_value)
 
-    f_in = open('mod_template.json','r')
+    f_in = open(mod_root + 'mod_template.json','r')
     s = json.load(f_in)
 
     for str0 in [str1, str2, str3]:
