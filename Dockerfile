@@ -39,5 +39,5 @@ ENV PYTHONPATH /matrix
 
 # a temprory entrypoint
 RUN chmod +x /matrix/matrix/service/start.py
-RUN chmod +x /matrix/matrix/frontdoor/transcoder-service.sh
+RUN chmod +x /matrix/matrix/frontdoor/transcoder/transcoder-service.sh
 ENTRYPOINT ["/matrix/matrix/service/start.py"]

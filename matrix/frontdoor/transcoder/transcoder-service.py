@@ -12,6 +12,7 @@ from flask import request
 from xml.etree import ElementTree
 
 from matrix.core.logger import logger
+from matrix.frontdoor.transcoder.process_template import process_template
 
 ip = socket.gethostbyname(socket.gethostname())
 app = Flask(__name__)
@@ -111,7 +112,8 @@ def parse_cmd(xmldata, type):
 #vcodec: h264
 #acodec: aac
 def start_task(input, out, bitrate, resolution, vcodec, acodec):
-  command = '/ffmpeg/ffmpeg -i %s -acodec copy -vcodec copy -f flv %s' % (input, out)
+  #command = '/ffmpeg/ffmpeg -i %s -acodec copy -vcodec copy -f flv %s' % (input, out)
+  command = process_template(input, out, bitrate, resolution, vcodec, acodec)
   curl_command = "curl http://%s:30000/matrix/add -d \"name=%s\" -d \"image=%s\" -d \"command=%s\" -d \"cpus=%s\" -d \"mem=%s\" -X POST" \
                  % (ip, input + ' ' + out, "180.97.185.35:5000/transcoder_v3", command, 1, 1024)
   logger.info(curl_command)

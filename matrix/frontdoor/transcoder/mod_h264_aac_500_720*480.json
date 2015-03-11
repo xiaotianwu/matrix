@@ -1,0 +1,11 @@
+        {
+            "-acodec":"libfaac",
+            "-b":"500k",
+            "-f":"flv",
+            "-preset":"superfast",
+            "-profile:v":"main",
+            "-s":"720x480",
+            "-vcodec":"libx264",
+            "-x264opts":"keyint=75",
+            "level:v":"31"
+        }
