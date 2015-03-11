@@ -26,7 +26,7 @@ def find_template(vcodec_value, acodec_value, bit_value, res_value):
 def process_template(input_path, output_path, bit_value, res_value, vcodec_value, acodec_value):
     file_name = find_template(vcodec_value, acodec_value, bit_value, res_value)
 
-    f_in = open(file_name,'r')
+    f_in = open(mod_root + file_name,'r')
     s = json.load(f_in)
 
     for line in s:
