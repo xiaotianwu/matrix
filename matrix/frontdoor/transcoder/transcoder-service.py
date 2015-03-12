@@ -115,7 +115,7 @@ def start_task(input, out, bitrate, resolution, vcodec, acodec):
   #command = '/ffmpeg/ffmpeg -i %s -acodec copy -vcodec copy -f flv %s' % (input, out)
   command = process_template(input, out, bitrate, resolution, vcodec, acodec)
   curl_command = "curl http://%s:30000/matrix/add -d \"name=%s\" -d \"image=%s\" -d \"command=%s\" -d \"cpus=%s\" -d \"mem=%s\" -X POST" \
-                 % (ip, input + ' ' + out, "180.97.185.35:5000/transcoder_v4", command, 1, 1024)
+                 % (ip, input + ' ' + out, "180.97.185.35:5000/transcoder_v5", command, 1, 1024)
   logger.info(curl_command)
   return_msg = subprocess.Popen(curl_command, stdout = subprocess.PIPE, shell = True)
   task_id = return_msg.stdout.read()
