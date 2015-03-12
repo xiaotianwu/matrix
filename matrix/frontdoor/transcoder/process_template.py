@@ -42,7 +42,7 @@ def process_template(input_path, output_path, bit_value, res_value, vcodec_value
             keyframe = s[line]
         elif line == '-vcodec':
             vcodec = s[line]
-        elif line == 'acodec':
+        elif line == '-acodec':
             acodec = s[line]
     ffmpeg_cmd = 'ffmpeg -i %s -preset %s -profile:v %s level:v %s -x264opts %s -b %sk -s %s -vcodec %s -acodec %s -f %s -y %s'%(input_path, preset, profile, level, keyframe, bit_value, res_value, vcodec, acodec, contain_format, output_path)
 
