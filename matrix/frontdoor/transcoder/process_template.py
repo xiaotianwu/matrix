@@ -40,8 +40,12 @@ def process_template(input_path, output_path, bit_value, res_value, vcodec_value
             level = s[line]
         elif line == '-x264opts':
             keyframe = s[line]
+        elif line == '-vcodec':
+            vcodec = s[line]
+        elif line == 'acodec':
+            acodec = s[line]
+    ffmpeg_cmd = 'ffmpeg -i %s -preset %s -profile:v %s level:v %s -x264opts %s -b %sk -s %s -vcodec %s -acodec %s -f %s -y %s'%(input_path, preset, profile, level, keyframe, bit_value, res_value, vcodec, acodec, contain_format, output_path)
 
-    ffmpeg_cmd = 'ffmpeg -i %s -preset %s -profile:v %s level:v %s -x264opts %s -b %sk -s %s -vcodec %s -acodec %s -f %s -y %s'%(input_path, preset, profile, level, keyframe, bit_value, res_value, vcodec_value, acodec_value, contain_format, output_path)
     return ffmpeg_cmd
 
 #process_template('rtmp://lxrtmp.load.cdn.zhanqi.tv/zqlive/27372_DdopD','rtmp://lxrtmp.load.cdn.zhanqi.tv/zqlive/newstreams', '500', '704*572', 'h264', 'aac')
