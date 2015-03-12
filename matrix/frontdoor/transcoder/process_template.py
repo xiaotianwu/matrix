@@ -28,7 +28,9 @@ def process_template(input_path, output_path, bit_value, res_value, vcodec_value
     print "open file name: %s" % file_name
     f_in = open(mod_root + file_name,'r')
     s = json.load(f_in)
-
+    vcodec = 'copy'
+    acodec = 'copy'
+    
     for line in s:
         if line == '-f':
             contain_format = s[line]
