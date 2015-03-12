@@ -7,5 +7,5 @@
             "-s":"720x480",
             "-vcodec":"libx264",
             "-x264opts":"keyint=75",
-            "level:v":"31",
+            "-level:v":"31",
         }
